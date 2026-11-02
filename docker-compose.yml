@@ -26,6 +26,7 @@ services:
     ports:
       - "127.0.0.1:${API_PORT:-8200}:8080"
     environment:
+      # GEMINI_MODEL: omit when unset. Empty string must be treated as unset (3.1).
       - LLM_PROVIDER=${LLM_PROVIDER:-gemini}
       - GEMINI_MODEL=${GEMINI_MODEL:-}
       - SECRETS_ENV_PATH=/config/rag/.env
@@ -38,10 +39,16 @@ services:
       - SWARM_MAX_ITERATIONS=${SWARM_MAX_ITERATIONS:-8}
       - SWARM_EXECUTION_TIMEOUT_SECONDS=${SWARM_EXECUTION_TIMEOUT_SECONDS:-180}
       - SWARM_NODE_TIMEOUT_SECONDS=${SWARM_NODE_TIMEOUT_SECONDS:-45}
+      - SWARM_REPETITIVE_HANDOFF_DETECTION=${SWARM_REPETITIVE_HANDOFF_DETECTION:-true}
       - SWARM_MAX_TOKENS_PER_RUN=${SWARM_MAX_TOKENS_PER_RUN:-100000}
       - SWARM_MAX_COST_USD_PER_RUN=${SWARM_MAX_COST_USD_PER_RUN:-1.00}
     volumes:
       - ${HOME}/.config/rag:/config/rag:ro
+    healthcheck:
+      test: ["CMD", "true"]
+      interval: 30s
+      timeout: 3s
+      retries: 1
     networks:
       - axiom
     security_opt:
@@ -62,6 +69,11 @@ services:
       - MCP_RESEARCH_DATA_URL=${MCP_RESEARCH_DATA_URL:-http://mcp-research-data:8080}
     volumes:
       - ${HOME}/.config/rag:/config/rag:ro
+    healthcheck:
+      test: ["CMD", "true"]
+      interval: 30s
+      timeout: 3s
+      retries: 1
     networks:
       - axiom
     security_opt:

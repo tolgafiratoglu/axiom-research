@@ -5,6 +5,9 @@ description = "AxiomResearch — energy and materials research intelligence"
 requires-python = ">=3.12"
 dependencies = [
     "pydantic>=2.12",
+    "pydantic-settings>=2.0",
+    "python-dotenv>=1.0",
+    "google-genai>=1.0",
 ]
 
 [project.optional-dependencies]

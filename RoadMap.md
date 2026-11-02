@@ -56,18 +56,19 @@ Repo, Compose skeleton, config, shared contracts. No agents yet.
 | --- | --- |
 | Host ports (`127.0.0.1`) | web `3200`, api `8200`, verifier `8201`, mcp `8210–8212`, postgres `5434` |
 | WS (browser) | `NEXT_PUBLIC_WS_URL=ws://127.0.0.1:8200/ws/session` |
-| Swarm | `max_handoffs=8`, `max_iterations=8`, execution `180s`, node `45s`, `100000` tokens, `$1.00` |
+| Swarm | `max_handoffs=8`, `max_iterations=8`, execution `180s`, node `45s`, repetitive handoff on, `100000` tokens, `$1.00` |
 | npm | root workspace `axiom-research`; `web` package `axiom-research-web` |
 | MCP dirs | `mcp/literature`, `mcp/materials`, `mcp/research_data` |
 | Tooling also in tree | `.gitignore` (keep `.cursor/rules`); `.cursor/rules/axiom-research.md` |
+| Gemini | `GEMINI_MODEL` in project `.env`; `GEMINI_API_KEY` only from `SECRETS_ENV_PATH=~/.config/rag/.env` (not project `.env` / process env); loader in `packages/axiom_research/settings.py` |
 
-**0.A done.** Phase 0 exit still needs 0.B.
+**0.A done.** 0.B schemas and contract tests are in `packages/axiom_research` + `tests/test_contracts.py`.
 
 ### 0.B Shared contracts
 
-- [ ] **0.5** Pydantic models for WebSocket envelopes: client `ask` / `cancel`; server `agent.started`, `agent.handoff`, `tool.summary`, `evidence.updated`, `hypothesis.created`, `a2a.verification`, `verification.gate`, `answer.final`, `run.failed`; heartbeat + `last_event_id`.
-- [ ] **0.6** Ledger record types: source, evidence, claim, calculation, hypothesis, verification, audit event (revision + fingerprint fields included).
-- [ ] **0.7** Agent identity enum: `planner`, `investigator`, `data_analyst`, `challenger`, `verifier`, `finalizer`.
+- [x] **0.5** Pydantic models for WebSocket envelopes: client `ask` / `cancel`; server `agent.started`, `agent.handoff`, `tool.summary`, `evidence.updated`, `hypothesis.created`, `a2a.verification`, `verification.gate`, `answer.final`, `run.failed`; heartbeat + `last_event_id`.
+- [x] **0.6** Ledger record types: source, evidence, claim, calculation, hypothesis, verification, audit event (revision + fingerprint fields included).
+- [x] **0.7** Agent identity enum: `planner`, `investigator`, `data_analyst`, `challenger`, `verifier`, `finalizer`.
 
 **Exit:** `docker compose config` succeeds; contract tests import schemas; no Gemini/MCP calls.
 
@@ -137,7 +138,7 @@ Exploratory collaboration inside `api`. No Verifier, no UI.
 
 ### 3.A Model adapter
 
-- [ ] **3.1** Gemini provider reads `GEMINI_MODEL` at runtime (same secret file as Travel RAG / NASA MCP: `GEMINI_API_KEY` in `~/.config/rag/.env`). Refuse to start if unset. Do not bake a model ID into code. Flash family, not Flash-Lite.
+- [ ] **3.1** Wire Strands `GeminiModel` to `axiom_research.settings` (travel-rag secrets load already in `packages/axiom_research`). Refuse to start if `GEMINI_MODEL` / `GEMINI_API_KEY` unset or empty. Do not bake a model ID into code. Flash family, not Flash-Lite.
 - [ ] **3.2** Token/cost accounting hook per agent turn.
 
 ### 3.B Agents and tools
