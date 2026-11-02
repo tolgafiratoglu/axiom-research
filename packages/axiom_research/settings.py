@@ -26,6 +26,10 @@ def load_gemini_api_key(secrets_env_path: str) -> str:
     return load_secret(secrets_env_path, "GEMINI_API_KEY")
 
 
+def load_mp_api_key(secrets_env_path: str) -> str:
+    return load_secret(secrets_env_path, "MP_API_KEY")
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",

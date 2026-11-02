@@ -1,0 +1,14 @@
+{
+  "data": [
+    {
+      "material_id": "mp-149",
+      "formula_pretty": "Si",
+      "band_gap": 0.614,
+      "formation_energy_per_atom": 0.0,
+      "energy_above_hull": 0.0,
+      "is_stable": true,
+      "symmetry": {"symbol": "Fd-3m"}
+    }
+  ],
+  "meta": {"total_doc": 1}
+}

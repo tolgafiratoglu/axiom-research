@@ -32,8 +32,14 @@ class UpstreamClient:
         self._sleep: SleepFn = sleep or _async_sleep
         self._secrets = secrets
 
-    async def get_json(self, url: str, *, params: dict[str, Any] | None = None) -> Any:
-        response = await self._request(url, params=params)
+    async def get_json(
+        self,
+        url: str,
+        *,
+        params: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
+    ) -> Any:
+        response = await self._request(url, params=params, headers=headers)
         try:
             return response.json()
         except ValueError as exc:
@@ -42,8 +48,14 @@ class UpstreamClient:
                 "upstream returned non-JSON payload",
             ) from exc
 
-    async def get_text(self, url: str, *, params: dict[str, Any] | None = None) -> str:
-        response = await self._request(url, params=params)
+    async def get_text(
+        self,
+        url: str,
+        *,
+        params: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
+    ) -> str:
+        response = await self._request(url, params=params, headers=headers)
         return response.text
 
     async def _request(
@@ -51,12 +63,13 @@ class UpstreamClient:
         url: str,
         *,
         params: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
     ) -> httpx2.Response:
         assert_metadata_only(url=url)
         last_error: McpRuntimeError | None = None
         for attempt in range(1, self._max_retries + 1):
             try:
-                response = await self._http.get(url, params=params)
+                response = await self._http.get(url, params=params, headers=headers)
             except httpx2.TimeoutException:
                 last_error = McpRuntimeError(
                     "UPSTREAM_TIMEOUT",

@@ -93,9 +93,9 @@ Real tools, HTTP transport, Docker. Empty servers are not allowed.
 
 ### 1.C `mcp-materials`
 
-- [ ] **1.8** Materials Project: identifiable computed properties, methods, units, limitations.
-- [ ] **1.9** PubChem PUG REST: compound metadata.
-- [ ] **1.10** Never label computed properties as experimental. Fixture tests.
+- [x] **1.8** Materials Project: identifiable computed properties, methods, units, limitations.
+- [x] **1.9** PubChem PUG REST: compound metadata.
+- [x] **1.10** Never label computed properties as experimental. Fixture tests.
 
 ### 1.D `mcp-research-data`
 
