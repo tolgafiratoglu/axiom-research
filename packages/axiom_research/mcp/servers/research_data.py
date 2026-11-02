@@ -1,14 +1,15 @@
-from axiom_research.mcp.runner import port_from_env, run_server
+from axiom_research.mcp.research_data.server import NAME, create_research_data_server
+from axiom_research.mcp.runner import build_asgi_app, port_from_env
 
-NAME = "axiom-research-mcp-research-data"
-INSTRUCTIONS = (
-    "Deposited research records (Zenodo) and independent PID resolve (DataCite). "
-    "Metadata only: no bulk file harvest, no vector index."
-)
+__all__ = ["NAME", "main"]
 
 
 def main() -> None:
-    run_server(name=NAME, instructions=INSTRUCTIONS, port=port_from_env())
+    server = create_research_data_server()
+    app = build_asgi_app(server)
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=port_from_env())
 
 
 if __name__ == "__main__":

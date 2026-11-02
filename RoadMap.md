@@ -99,14 +99,14 @@ Real tools, HTTP transport, Docker. Empty servers are not allowed.
 
 ### 1.D `mcp-research-data`
 
-- [ ] **1.11** Zenodo: deposited records, versions, licenses.
-- [ ] **1.12** DataCite: independent PID/metadata resolve (Verifier path).
-- [ ] **1.13** Fixture tests. Zenodo vs DataCite purposes stay distinct.
+- [x] **1.11** Zenodo: deposited records, versions, licenses.
+- [x] **1.12** DataCite: independent PID/metadata resolve (Verifier path).
+- [x] **1.13** Fixture tests. Zenodo vs DataCite purposes stay distinct.
 
 ### 1.E Compose wiring
 
-- [ ] **1.14** Three MCP services healthy in Compose; `GET`-style health on each.
-- [ ] **1.15** Optional live smoke script (manual, not CI): one call per provider with real keys.
+- [x] **1.14** Three MCP services healthy in Compose; `GET`-style health on each.
+- [x] **1.15** Optional live smoke script (manual, not CI): one call per provider with real keys.
 
 **Exit:** all MCP tools have fixture tests; Compose brings three servers up; operator (not agent) can list tools with Inspector or equivalent.
 
@@ -118,9 +118,9 @@ Durable structured store. Swarm chat is not the ledger.
 
 ### 2.A Persistence
 
-- [ ] **2.1** Postgres schema + migrations for sessions, runs, ledger tables, event log, traces, eval records.
-- [ ] **2.2** Snapshot freeze: immutable copy of claim/evidence revisions used for a gate/Finalizer pass.
-- [ ] **2.3** Revision increment invalidates `verification` bound to older fingerprint.
+- [x] **2.1** Postgres schema + migrations for sessions, runs, ledger tables, event log, traces, eval records.
+- [x] **2.2** Snapshot freeze: immutable copy of claim/evidence revisions used for a gate/Finalizer pass.
+- [x] **2.3** Revision increment invalidates `verification` bound to older fingerprint.
 
 ### 2.B Ledger tools (local, in `api`)
 

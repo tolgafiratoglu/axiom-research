@@ -40,6 +40,7 @@ class Settings(BaseSettings):
     llm_provider: Literal["gemini"] = "gemini"
     gemini_model: str = ""
     secrets_env_path: str = "~/.config/rag/.env"
+    database_url: str = "postgresql://axiom:axiom@127.0.0.1:5434/axiom_research"
 
     @property
     def gemini_api_key(self) -> str:

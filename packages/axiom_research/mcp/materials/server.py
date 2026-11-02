@@ -33,7 +33,7 @@ INSTRUCTIONS = (
 
 @dataclass
 class MaterialsContext:
-    materials_project: MaterialsProjectClient
+    materials_project: MaterialsProjectClient | None
     pubchem: PubChemClient
 
 
@@ -44,12 +44,8 @@ def create_materials_server(
 ) -> MCPServer:
     @asynccontextmanager
     async def lifespan(_server: MCPServer) -> AsyncIterator[MaterialsContext]:
+        # Empty key: process still serves /health; MP tools fail until secrets mount.
         key = mp_api_key if mp_api_key is not None else load_mp_api_key(settings.secrets_env_path)
-        if not key:
-            raise RuntimeError(
-                "MP_API_KEY not set. Add it to "
-                f"{settings.secrets_env_path} (not the project .env)."
-            )
         http = (
             http_factory()
             if http_factory is not None
@@ -58,11 +54,9 @@ def create_materials_server(
                 headers={"User-Agent": "axiom-research-mcp-materials/0.1"},
             )
         )
-        upstream = UpstreamClient(http, secrets=(key,))
-        ctx = MaterialsContext(
-            materials_project=MaterialsProjectClient(upstream, api_key=key),
-            pubchem=PubChemClient(upstream),
-        )
+        upstream = UpstreamClient(http, secrets=(key,) if key else ())
+        mp_client = MaterialsProjectClient(upstream, api_key=key) if key else None
+        ctx = MaterialsContext(materials_project=mp_client, pubchem=PubChemClient(upstream))
         try:
             yield ctx
         finally:
@@ -71,6 +65,16 @@ def create_materials_server(
     mcp = MCPServer(NAME, instructions=INSTRUCTIONS, version="0.1.0", lifespan=lifespan)
     _register_tools(mcp)
     return mcp
+
+
+def _mp(ctx: Context[MaterialsContext]) -> MaterialsProjectClient:
+    client = _app(ctx).materials_project
+    if client is None:
+        raise McpRuntimeError(
+            "UNAUTHORIZED",
+            "MP_API_KEY not set; add it to SECRETS_ENV_PATH",
+        )
+    return client
 
 
 def _register_tools(mcp: MCPServer) -> None:
@@ -85,7 +89,7 @@ def _register_tools(mcp: MCPServer) -> None:
         Never experimental. Not PubChem compound metadata.
         """
         try:
-            return await _app(ctx).materials_project.get_material(material_id)
+            return await _mp(ctx).get_material(material_id)
         except McpRuntimeError as exc:
             raise _tool_error(exc) from exc
 
@@ -100,7 +104,7 @@ def _register_tools(mcp: MCPServer) -> None:
         Computed properties only (band gap, formation energy, …). Not lab measurements.
         """
         try:
-            return await _app(ctx).materials_project.search_by_formula(formula, limit=limit)
+            return await _mp(ctx).search_by_formula(formula, limit=limit)
         except McpRuntimeError as exc:
             raise _tool_error(exc) from exc
 

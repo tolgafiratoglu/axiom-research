@@ -1,5 +1,5 @@
-# Named services only. App images are sleep/health stubs until their phases.
-# `docker compose config` must succeed without live Gemini or scientific APIs.
+# Named services. MCP images are real (mcp/Dockerfile); web/api/verifier stay stubs
+# until later phases. `docker compose config` needs no live Gemini/scientific APIs.
 name: axiom-research
 
 services:
@@ -80,48 +80,89 @@ services:
       - no-new-privileges:true
 
   mcp-literature:
-    image: busybox:1.36
+    build:
+      context: .
+      dockerfile: mcp/Dockerfile
+    image: axiom-research-mcp:0.1.0
     container_name: axiom-research-mcp-literature
-    command: ["sleep", "infinity"]
+    command: ["axiom-mcp-literature"]
+    environment:
+      - PORT=8080
+      - SECRETS_ENV_PATH=/config/rag/.env
     ports:
       - "127.0.0.1:${MCP_LITERATURE_PORT:-8210}:8080"
     healthcheck:
-      test: ["CMD", "true"]
-      interval: 30s
-      timeout: 3s
-      retries: 1
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=2)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
     networks:
       - axiom
     security_opt:
       - no-new-privileges:true
 
   mcp-materials:
-    image: busybox:1.36
+    build:
+      context: .
+      dockerfile: mcp/Dockerfile
+    image: axiom-research-mcp:0.1.0
     container_name: axiom-research-mcp-materials
-    command: ["sleep", "infinity"]
+    command: ["axiom-mcp-materials"]
+    environment:
+      - PORT=8080
+      - SECRETS_ENV_PATH=/config/rag/.env
+    volumes:
+      - ${HOME}/.config/rag:/config/rag:ro
     ports:
       - "127.0.0.1:${MCP_MATERIALS_PORT:-8211}:8080"
     healthcheck:
-      test: ["CMD", "true"]
-      interval: 30s
-      timeout: 3s
-      retries: 1
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=2)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
     networks:
       - axiom
     security_opt:
       - no-new-privileges:true
 
   mcp-research-data:
-    image: busybox:1.36
+    build:
+      context: .
+      dockerfile: mcp/Dockerfile
+    image: axiom-research-mcp:0.1.0
     container_name: axiom-research-mcp-research-data
-    command: ["sleep", "infinity"]
+    command: ["axiom-mcp-research-data"]
+    environment:
+      - PORT=8080
+      - SECRETS_ENV_PATH=/config/rag/.env
     ports:
       - "127.0.0.1:${MCP_RESEARCH_DATA_PORT:-8212}:8080"
     healthcheck:
-      test: ["CMD", "true"]
-      interval: 30s
-      timeout: 3s
-      retries: 1
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=2)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
     networks:
       - axiom
     security_opt:

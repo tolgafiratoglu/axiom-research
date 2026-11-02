@@ -121,3 +121,19 @@ class AuditEvent(LedgerRecord):
     agent_id: AgentId | None = None
     fingerprint: str
     revision: int = 1
+
+
+class LedgerSnapshot(LedgerRecord):
+    """Immutable freeze of claim/evidence/source revisions for a gate pass."""
+
+    snapshot_id: str
+    session_id: str
+    run_id: str
+    frozen_at: datetime
+    sources: list[SourceRecord]
+    evidence: list[EvidenceRecord]
+    claims: list[ClaimRecord]
+    calculations: list[CalculationRecord]
+    hypotheses: list[HypothesisRecord]
+    verifications: list[VerificationRecord]
+    fingerprint: str

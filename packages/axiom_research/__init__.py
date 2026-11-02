@@ -26,11 +26,13 @@ from axiom_research.ledger import (
     EvidenceKind,
     EvidenceRecord,
     HypothesisRecord,
+    LedgerSnapshot,
     SourceRecord,
     VerificationRecord,
     VerificationStatus,
     VerificationVerdict,
 )
+from axiom_research.ledger_store import InMemoryLedgerStore
 
 __version__ = "0.1.0"
 
@@ -51,6 +53,8 @@ __all__ = [
     "Heartbeat",
     "HypothesisCreated",
     "HypothesisRecord",
+    "InMemoryLedgerStore",
+    "LedgerSnapshot",
     "RunFailed",
     "SERVER_EVENT_TYPES",
     "ServerHeartbeat",

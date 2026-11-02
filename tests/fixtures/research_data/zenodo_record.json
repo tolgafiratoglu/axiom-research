@@ -1,0 +1,24 @@
+{
+  "id": 1234567,
+  "conceptrecid": "1234566",
+  "doi": "10.5281/zenodo.1234567",
+  "conceptdoi": "10.5281/zenodo.1234566",
+  "metadata": {
+    "title": "Solid-state battery cycling dataset",
+    "publication_date": "2024-06-01",
+    "version": "1.1.0",
+    "access_right": "open",
+    "resource_type": {"type": "dataset", "title": "Dataset"},
+    "license": {
+      "id": "cc-by-4.0",
+      "links": {"url": "https://creativecommons.org/licenses/by/4.0/"}
+    }
+  },
+  "files": [
+    {"key": "readme.md", "size": 120},
+    {"key": "data.csv", "size": 2048}
+  ],
+  "links": {
+    "html": "https://zenodo.org/records/1234567"
+  }
+}
