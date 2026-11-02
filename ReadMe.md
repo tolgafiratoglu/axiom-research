@@ -1,13 +1,14 @@
-# Science Council
+# AxiomResearch
 
 **Energy & Materials Research Intelligence — Evidence-Driven Multi-Agent System**
 
 **Status:** Architecture definition / pre-implementation  
+**Build order:** [`RoadMap.md`](./RoadMap.md) — follow phases 0–9 in order; this README is the locked target, not a backlog.  
 **Purpose:** A complete, interview-ready reference project demonstrating **Strands Agents, autonomous Swarm handoffs, MCP, remote A2A verification, revisioned evidence, and measurable multi-agent performance**.
 
 ## Vision
 
-Science Council investigates difficult **energy-storage and materials-science** questions by connecting published research, calculated material properties, chemical records, and research datasets. It is **not** a paper summarizer and does **not** infer industrial readiness from a promising calculation or single laboratory result.
+AxiomResearch (`axiom-research`) investigates difficult **energy-storage and materials-science** questions by connecting published research, calculated material properties, chemical records, and research datasets. It is **not** a paper summarizer and does **not** infer industrial readiness from a promising calculation or single laboratory result.
 
 Its distinctive capability is to show **what a scientific claim is supported by, how the evidence was challenged, and whether an independent agent could reproduce the source check**. Every architectural component must have a demonstrable purpose in a live interview—not merely appear in a diagram.
 
@@ -47,12 +48,12 @@ One Next.js screen, one conversation, **one WebSocket**. No SSE, no extra `POST 
 
 ## Runtime and Deployment
 
-**Core LLM:** Gemini 3.5 Flash, called over Google’s API. Default `GEMINI_MODEL=gemini-3.5-flash` (`LLM_PROVIDER=gemini`). Secrets live in the same file as Travel RAG and NASA MCP: `GEMINI_API_KEY` in `~/.config/rag/.env`. 3.5 Flash, not Flash-Lite (Travel RAG’s default): Swarm, Challenger, Verifier, and Finalizer share this one hosted model. Gemini itself is **not** containerized.
+**Core LLM:** Gemini Flash via Google’s API (`LLM_PROVIDER=gemini`). The concrete model ID is **only** `GEMINI_MODEL` — a currently supported Flash ID from [Google AI for Developers](https://ai.google.dev/gemini-api/docs/models). Do not hard-code IDs in source. As of the 2026-10-30 Gemini API changelog, `gemini-3.5-flash` is deprecated and requests are routed to `gemini-3.6-flash`; set `GEMINI_MODEL` to a live Flash model (for example `gemini-3.6-flash` or later), not Flash-Lite. Secrets live in the same file as Travel RAG and NASA MCP: `GEMINI_API_KEY` in `~/.config/rag/.env`. Swarm, Challenger, Verifier, and Finalizer share this one hosted model. Gemini itself is **not** containerized.
 
 **Everything else that we run** is a Docker Compose service. Compose is the orchestration; Kubernetes, Kafka, and extra “platform” brokers are out of scope.
 
 ```text
-                         Gemini 3.5 Flash (hosted API)
+                         Gemini Flash (hosted API, GEMINI_MODEL)
                                   ^
            api + verifier + (optional eval runner) call it
                                   |
@@ -229,7 +230,7 @@ Illustrative claim (not a scientific assertion):
 - Keep bibliographic metadata separate from article full text. **Do not automatically download or vector-index copyrighted PDFs or abstracts.** No persistent RAG store is needed for this product.
 - Inspect provider terms and item-level licenses; retain attribution, provenance and permitted-use metadata. Restrict cache/storage/redistribution by policy.
 - Present versioned preprints and computed datasets with their scientific status and limitations; do not turn estimates into discoveries.
-- Science Council is a research decision-support and evidence-tracing tool, not a substitute for domain expert review.
+- AxiomResearch is a research decision-support and evidence-tracing tool, not a substitute for domain expert review.
 
 ## Evaluation: Prove That Multi-Agent Collaboration Helps
 
