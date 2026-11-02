@@ -9,6 +9,8 @@ This is the **implementation order** of the single target system in [`ReadMe.md`
 - Checkboxes are the source of progress. Mark `[x]` only when the item is in the tree and its tests (if listed) pass.
 - If a change would violate [`ReadMe.md`](./ReadMe.md) boundaries, change the README first — do not “just ship it”.
 - Live provider APIs and Gemini are **not** called from unit tests. Fixtures and mocks only.
+- Agent runs **only** the fixture named on the current item (`pytest` that file, once). Operator runs `docker compose up`, live smoke (1.15), Inspector, eval live runner, and `DEMO.md`.
+- Ports, Swarm budget numbers, npm names, and MCP directory names recorded in **0.A** stay unless the README changes.
 
 **Locked decisions (do not revisit during build)**
 
@@ -47,6 +49,19 @@ Repo, Compose skeleton, config, shared contracts. No agents yet.
 - [x] **0.2** Python package metadata (`pyproject.toml`, import `axiom_research`), ruff/pytest, Node workspace for `web` (`name: axiom-research`).
 - [x] **0.3** `.env.example`: `LLM_PROVIDER=gemini`, `GEMINI_MODEL` (operator-chosen supported Flash ID; no retired default), `SECRETS_ENV_PATH=~/.config/rag/.env`, service URLs, Swarm budget defaults. Comment the Google AI for Developers model list; as of 2026-10-30 `gemini-3.5-flash` is deprecated and routed to `gemini-3.6-flash`.
 - [x] **0.4** Root `docker-compose.yml` with `name: axiom-research` and **named services only** (can be `sleep`/health stubs): `web`, `api`, `verifier`, `mcp-literature`, `mcp-materials`, `mcp-research-data`, `postgres`.
+
+**0.A recorded defaults** (tree + `.env.example`; do not re-pick in 3.8 / 7.6):
+
+| Item | Value |
+| --- | --- |
+| Host ports (`127.0.0.1`) | web `3200`, api `8200`, verifier `8201`, mcp `8210–8212`, postgres `5434` |
+| WS (browser) | `NEXT_PUBLIC_WS_URL=ws://127.0.0.1:8200/ws/session` |
+| Swarm | `max_handoffs=8`, `max_iterations=8`, execution `180s`, node `45s`, `100000` tokens, `$1.00` |
+| npm | root workspace `axiom-research`; `web` package `axiom-research-web` |
+| MCP dirs | `mcp/literature`, `mcp/materials`, `mcp/research_data` |
+| Tooling also in tree | `.gitignore` (keep `.cursor/rules`); `.cursor/rules/axiom-research.md` |
+
+**0.A done.** Phase 0 exit still needs 0.B.
 
 ### 0.B Shared contracts
 
@@ -92,7 +107,7 @@ Real tools, HTTP transport, Docker. Empty servers are not allowed.
 - [ ] **1.14** Three MCP services healthy in Compose; `GET`-style health on each.
 - [ ] **1.15** Optional live smoke script (manual, not CI): one call per provider with real keys.
 
-**Exit:** all MCP tools have fixture tests; Compose brings three servers up; Inspector or equivalent can list tools.
+**Exit:** all MCP tools have fixture tests; Compose brings three servers up; operator (not agent) can list tools with Inspector or equivalent.
 
 ---
 
@@ -102,7 +117,7 @@ Durable structured store. Swarm chat is not the ledger.
 
 ### 2.A Persistence
 
-- [ ] **2.1** Postgres schema + migrations for sessions, runs, ledger tables, event log.
+- [ ] **2.1** Postgres schema + migrations for sessions, runs, ledger tables, event log, traces, eval records.
 - [ ] **2.2** Snapshot freeze: immutable copy of claim/evidence revisions used for a gate/Finalizer pass.
 - [ ] **2.3** Revision increment invalidates `verification` bound to older fingerprint.
 
@@ -135,7 +150,7 @@ Exploratory collaboration inside `api`. No Verifier, no UI.
 ### 3.C Swarm runtime
 
 - [ ] **3.7** `handoff_to_agent`; `entry_point=planner`.
-- [ ] **3.8** Budgets tighter than SDK defaults (target: `max_handoffs=8`, `max_iterations=8`, short `execution_timeout` / `node_timeout`). Repetitive handoff detection **on**.
+- [ ] **3.8** Budgets from 0.A: `max_handoffs=8`, `max_iterations=8`, `execution_timeout=180s`, `node_timeout=45s`. Repetitive handoff detection **on**.
 - [ ] **3.9** Per-question token/cost ceiling; stop with `run.failed` semantics when exceeded.
 - [ ] **3.10** CLI: `python -m api.cli "question"` prints node history + ledger summary (no Finalizer yet).
 - [ ] **3.11** Tests with mocked MCP + mocked Gemini: tool-visibility, planner-without-MCP, analyst-does-not-search, repetitive handoff stops.
