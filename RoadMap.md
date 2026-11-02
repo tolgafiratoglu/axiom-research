@@ -124,11 +124,13 @@ Durable structured store. Swarm chat is not the ledger.
 
 ### 2.B Ledger tools (local, in `api`)
 
-- [ ] **2.4** Tools: upsert source, evidence, claim, calculation, hypothesis; attach evidence to claim; freeze snapshot; read current snapshot.
-- [ ] **2.5** Calculations store inputs, formula, units, output (replayable).
-- [ ] **2.6** Unit tests: stale verification after edit; hypothesis cannot be read as a claim; missing units rejected on numeric claims.
+- [x] **2.4** Tools: upsert source, evidence, claim, calculation, hypothesis; attach evidence to claim; freeze snapshot; read current snapshot.
+- [x] **2.5** Calculations store inputs, formula, units, output (replayable).
+- [x] **2.6** Unit tests: stale verification after edit; hypothesis cannot be read as a claim; missing units rejected on numeric claims.
 
 **Exit:** ledger round-trip tests pass against Compose Postgres; no LLM involved.
+(`tests/test_ledger_tools.py` mocked; operator: `AXIOM_LEDGER_PG_TEST=1 pytest tests/test_ledger_postgres.py` after `postgres` + `axiom-db-migrate`.)
+
 
 ---
 
@@ -138,8 +140,8 @@ Exploratory collaboration inside `api`. No Verifier, no UI.
 
 ### 3.A Model adapter
 
-- [ ] **3.1** Wire Strands `GeminiModel` to `axiom_research.settings` (travel-rag secrets load already in `packages/axiom_research`). Refuse to start if `GEMINI_MODEL` / `GEMINI_API_KEY` unset or empty. Do not bake a model ID into code. Flash family, not Flash-Lite.
-- [ ] **3.2** Token/cost accounting hook per agent turn.
+- [x] **3.1** Wire Strands `GeminiModel` to `axiom_research.settings` (travel-rag secrets load already in `packages/axiom_research`). Refuse to start if `GEMINI_MODEL` / `GEMINI_API_KEY` unset or empty. Do not bake a model ID into code. Flash family, not Flash-Lite.
+- [x] **3.2** Token/cost accounting hook per agent turn.
 
 ### 3.B Agents and tools
 

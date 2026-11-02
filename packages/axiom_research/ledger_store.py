@@ -11,7 +11,7 @@ import hashlib
 import json
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, Protocol
 
 from axiom_research.ledger import (
     CalculationRecord,
@@ -30,6 +30,74 @@ def _fingerprint_payload(payload: dict[str, Any]) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
+def claim_body_fingerprint(record: ClaimRecord) -> str:
+    payload = record.model_dump(
+        mode="json",
+        exclude={
+            "fingerprint",
+            "revision",
+            "verification_status",
+            "verified_revision",
+        },
+    )
+    return _fingerprint_payload(payload)
+
+
+class LedgerStore(Protocol):
+    def upsert_source(self, session_id: str, record: SourceRecord) -> SourceRecord: ...
+
+    def upsert_evidence(self, session_id: str, record: EvidenceRecord) -> EvidenceRecord: ...
+
+    def upsert_claim(self, session_id: str, record: ClaimRecord) -> ClaimRecord: ...
+
+    def upsert_calculation(
+        self, session_id: str, record: CalculationRecord
+    ) -> CalculationRecord: ...
+
+    def upsert_hypothesis(
+        self, session_id: str, record: HypothesisRecord
+    ) -> HypothesisRecord: ...
+
+    def upsert_verification(
+        self, session_id: str, record: VerificationRecord
+    ) -> VerificationRecord: ...
+
+    def get_claim(self, session_id: str, claim_id: str) -> ClaimRecord | None: ...
+
+    def get_hypothesis(
+        self, session_id: str, hypothesis_id: str
+    ) -> HypothesisRecord | None: ...
+
+    def get_evidence(
+        self, session_id: str, evidence_id: str
+    ) -> EvidenceRecord | None: ...
+
+    def current_verification_for_claim(
+        self, session_id: str, claim_id: str
+    ) -> VerificationRecord | None: ...
+
+    def attach_evidence(
+        self, session_id: str, *, claim_id: str, evidence_id: str
+    ) -> ClaimRecord: ...
+
+    def freeze_snapshot(
+        self,
+        *,
+        snapshot_id: str,
+        session_id: str,
+        run_id: str,
+        frozen_at: datetime | None = None,
+    ) -> LedgerSnapshot: ...
+
+    def get_snapshot(
+        self, session_id: str, snapshot_id: str
+    ) -> LedgerSnapshot | None: ...
+
+    def current_snapshot(
+        self, session_id: str, *, run_id: str | None = None
+    ) -> LedgerSnapshot | None: ...
+
+
 @dataclass
 class SessionLedger:
     session_id: str
@@ -40,6 +108,7 @@ class SessionLedger:
     hypotheses: dict[str, HypothesisRecord] = field(default_factory=dict)
     verifications: dict[str, VerificationRecord] = field(default_factory=dict)
     snapshots: dict[str, LedgerSnapshot] = field(default_factory=dict)
+    snapshot_order: list[str] = field(default_factory=list)
 
 
 class InMemoryLedgerStore:
@@ -52,6 +121,13 @@ class InMemoryLedgerStore:
         if session_id not in self._sessions:
             self._sessions[session_id] = SessionLedger(session_id=session_id)
         return self._sessions[session_id]
+
+    def get_evidence(
+        self, session_id: str, evidence_id: str
+    ) -> EvidenceRecord | None:
+        session = self._session(session_id)
+        evidence = session.evidence.get(evidence_id)
+        return None if evidence is None else evidence.model_copy(deep=True)
 
     def upsert_source(self, session_id: str, record: SourceRecord) -> SourceRecord:
         session = self._session(session_id)
@@ -163,6 +239,28 @@ class InMemoryLedgerStore:
                 return ver.model_copy(deep=True)
         return None
 
+    def attach_evidence(
+        self, session_id: str, *, claim_id: str, evidence_id: str
+    ) -> ClaimRecord:
+        session = self._session(session_id)
+        claim = session.claims.get(claim_id)
+        if claim is None:
+            raise KeyError(f"claim not found: {claim_id}")
+        if session.evidence.get(evidence_id) is None:
+            raise KeyError(f"evidence not found: {evidence_id}")
+        evidence_ids = list(claim.evidence_ids)
+        if evidence_id not in evidence_ids:
+            evidence_ids.append(evidence_id)
+        updated = claim.model_copy(
+            update={
+                "evidence_ids": evidence_ids,
+                "fingerprint": claim_body_fingerprint(
+                    claim.model_copy(update={"evidence_ids": evidence_ids})
+                ),
+            }
+        )
+        return self.upsert_claim(session_id, updated)
+
     def freeze_snapshot(
         self,
         *,
@@ -202,12 +300,25 @@ class InMemoryLedgerStore:
         )
         # Store an independent deep copy so later ledger edits cannot mutate freeze.
         session.snapshots[snapshot_id] = snapshot.model_copy(deep=True)
+        if snapshot_id in session.snapshot_order:
+            session.snapshot_order.remove(snapshot_id)
+        session.snapshot_order.append(snapshot_id)
         return snapshot.model_copy(deep=True)
 
     def get_snapshot(self, session_id: str, snapshot_id: str) -> LedgerSnapshot | None:
         session = self._session(session_id)
         snap = session.snapshots.get(snapshot_id)
         return None if snap is None else snap.model_copy(deep=True)
+
+    def current_snapshot(
+        self, session_id: str, *, run_id: str | None = None
+    ) -> LedgerSnapshot | None:
+        session = self._session(session_id)
+        for snapshot_id in reversed(session.snapshot_order):
+            snap = session.snapshots[snapshot_id]
+            if run_id is None or snap.run_id == run_id:
+                return snap.model_copy(deep=True)
+        return None
 
     def _drop_stale_verifications(
         self,

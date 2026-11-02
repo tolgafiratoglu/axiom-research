@@ -41,6 +41,9 @@ class Settings(BaseSettings):
     gemini_model: str = ""
     secrets_env_path: str = "~/.config/rag/.env"
     database_url: str = "postgresql://axiom:axiom@127.0.0.1:5434/axiom_research"
+    # Operator-overridable Flash pricing for Swarm token/cost accounting (USD / 1M tokens).
+    gemini_input_usd_per_mtok: float = 0.30
+    gemini_output_usd_per_mtok: float = 2.50
 
     @property
     def gemini_api_key(self) -> str:
@@ -48,11 +51,23 @@ class Settings(BaseSettings):
 
 
 def require_gemini(settings: Settings) -> Settings:
-    if not (settings.gemini_model or "").strip():
+    model = (settings.gemini_model or "").strip()
+    if not model:
         raise RuntimeError(
             "GEMINI_MODEL is unset or empty. Set a currently supported Gemini "
             "Flash ID in the project .env (not Flash-Lite; do not use retired "
             "IDs such as gemini-3.5-flash)."
+        )
+    lowered = model.lower().replace("_", "-")
+    if "flash-lite" in lowered:
+        raise RuntimeError(
+            "GEMINI_MODEL must be a Gemini Flash ID, not Flash-Lite "
+            f"(got {model!r})."
+        )
+    if "flash" not in lowered:
+        raise RuntimeError(
+            "GEMINI_MODEL must be a Gemini Flash family ID "
+            f"(got {model!r})."
         )
     if not settings.gemini_api_key:
         raise RuntimeError(
