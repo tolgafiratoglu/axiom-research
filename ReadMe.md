@@ -1,4 +1,3 @@
-
 # Science Council
 
 **Energy & Materials Research Intelligence — Evidence-Driven Multi-Agent System**
@@ -22,44 +21,116 @@ The research workflow may encounter publications from other disciplines, but it 
 
 ## User Experience
 
-- **Single Next.js screen; one continuous conversation.** Users ask a question, inspect the investigation, and ask contextual follow-ups such as “What about sodium-ion batteries?”
-- A prominent **Final Assessment** panel at the top displays supported conclusions, citations, disputed points, and uncertainty. During investigation it shows an accurate in-progress state; it must never present a provisional claim as final.
-- The conversation streams meaningful events: agent activity, **local Swarm handoffs**, MCP tool summaries, ledger changes, and **remote A2A verification**. Local handoff and networked A2A must be visibly distinct.
-- Claims expand into their provenance: DOI / arXiv ID / Materials Project ID / dataset DOI, source version, units, retrieval time, method, license, and verification status.
-- Group noisy tool calls; show useful summaries rather than raw JSON dumps. Never expose private chain-of-thought.
+One Next.js screen, one conversation, **one WebSocket**. No SSE, no extra `POST /chat` plus a second event channel, no per-agent dashboards.
+
+```text
+┌─────────────────────────────────────────────┐
+│  FINAL ASSESSMENT  (sticky viewport chrome) │
+│  running: who is active, claim counts       │
+│  done: conclusions, citations, disputes     │
+├─────────────────────────────────────────────┤
+│  investigation thread (only this scrolls)   │
+│    user question                            │
+│    typed events: handoff, tool, claim, A2A  │
+├─────────────────────────────────────────────┤
+│  input                                      │
+└─────────────────────────────────────────────┘
+```
+
+- Users ask a question and follow up in the same thread (“What about sodium-ion batteries?”).
+- Agents write **into the thread** as compact typed events, not long private essays. Local Swarm handoff and remote A2A verification must be visually distinct.
+- The **Final Assessment** is a sticky panel at the top of the viewport, not the first message in the scrollback. While the run is in progress it shows status only — never a draft conclusion. When the gate passes, the Finalizer result appears there once.
+- The Finalizer answer is **not** duplicated as a second assistant bubble at the bottom. The thread gets a short system line: the assessment is above.
+- Claims expand **inline** in the same flow (DOI / arXiv ID / Materials Project ID / dataset DOI, version, units, retrieval time, method, license, verification status). No second evidence column.
+- Group noisy tool calls; show summaries rather than raw JSON. Never expose private chain-of-thought.
+- On follow-up, the sticky panel returns to in-progress for the new run. The previous assessment is pinned into the thread as a collapsed history card so earlier verdicts remain inspectable.
+
+## Runtime and Deployment
+
+**Core LLM:** Gemini 3.5 Flash, called over Google’s API. Default `GEMINI_MODEL=gemini-3.5-flash` (`LLM_PROVIDER=gemini`). Secrets live in the same file as Travel RAG and NASA MCP: `GEMINI_API_KEY` in `~/.config/rag/.env`. 3.5 Flash, not Flash-Lite (Travel RAG’s default): Swarm, Challenger, Verifier, and Finalizer share this one hosted model. Gemini itself is **not** containerized.
+
+**Everything else that we run** is a Docker Compose service. Compose is the orchestration; Kubernetes, Kafka, and extra “platform” brokers are out of scope.
+
+```text
+                         Gemini 3.5 Flash (hosted API)
+                                  ^
+           api + verifier + (optional eval runner) call it
+                                  |
+┌─────────────────────────────────┴─────────────────────────────────┐
+│ Docker Compose                                                    │
+│                                                                   │
+│  web (Next.js)  --WebSocket-->  api (FastAPI)                     │
+│                                   |  local Strands Swarm           │
+│                                   |  gate + tool-less Finalizer    │
+│                                   |  ledger tools + calc tools     │
+│                                   |                                │
+│                                   +-- A2A --> verifier             │
+│                                   |           separate container,  │
+│                                   |           fresh context,       │
+│                                   |           own MCP clients      │
+│                                   |                                │
+│     mcp-literature   mcp-materials   mcp-research-data             │
+│     (MCP HTTP)       (MCP HTTP)      (MCP HTTP)                    │
+│                                   |                                │
+│                               postgres                             │
+│                        sessions + Evidence Ledger                  │
+└───────────────────────────────────────────────────────────────────┘
+
+External scientific APIs (OpenAlex, Crossref, arXiv, Materials Project,
+PubChem, Zenodo, DataCite) stay outside the compose file, same as Gemini.
+```
+
+| Service | Runs | Notes |
+| --- | --- | --- |
+| `web` | Next.js UI | Talks only to `api` over WebSocket. |
+| `api` | FastAPI + local Swarm + gate + Finalizer | Single process for exploratory Swarm. Owns the socket, budgets, and ledger writes. |
+| `verifier` | Independent Verifier as an A2A server | Separate container so it cannot see Swarm memory. Invoked by application code after Swarm, **not** as a Swarm node (`A2AAgent` is not supported inside Swarm). |
+| `mcp-literature` | OpenAlex, Crossref, arXiv tools | Real MCP server, HTTP/streamable transport (not STDIO). |
+| `mcp-materials` | Materials Project, PubChem tools | Same. |
+| `mcp-research-data` | Zenodo, DataCite tools | Same. |
+| `postgres` | Sessions, ledger, traces, eval records | Simple durable store; not a data platform. |
+
+MCP servers are Docker services because agent ≠ API and because STDIO subprocesses do not cross container boundaries. `api` and `verifier` open **independent MCP clients** to the same three servers; they do not share a Swarm transcript. Do not duplicate MCP containers just to look more distributed.
 
 ## Architecture
 
 ```text
-Next.js: single conversation + final assessment + evidence inspection
-           |  HTTP + SSE
-           v
-FastAPI: sessions, stream adapter, run control, budgets, audit events
-           |
-           +--> Strands Swarm (single local process)
-           |      Research Planner -- autonomous handoff -->
-           |      Investigator <--> Data Analyst <--> Challenger
-           |           |                  |                  |
-           |      approved MCP reads   local calc tools   ledger only
-           |           \__________________|_________________/
-           |                              |
-           |                    Evidence Ledger
-           |                 (claims, sources, revisions,
-           |                  calculations, hypotheses)
-           |
-           +--> Deterministic Verification Gate
-           |           |   checks current ledger snapshot
-           |           +---- A2A request ----> Remote Verifier
-           |                                 separate process, fresh
-           |                                 context, independent MCP reads
-           |           <---- typed verification records ----+
-           |           |
-           |           +--> revision and coverage policy
-           |
-           +--> Tool-less Finalizer (only after passing policy)
-           |           |
-           +--> persisted conversation + ledger + trace/eval records
+Next.js (web)
+    |  WebSocket (single session socket)
+    v
+FastAPI (api): sessions, run control, budgets, audit events
+    |
+    +--> Strands Swarm (in-process)
+    |      Research Planner -- autonomous handoff -->
+    |      Investigator <--> Data Analyst <--> Challenger
+    |           |                  |                  |
+    |      approved MCP HTTP    local calc tools   ledger only
+    |           \__________________|_________________/
+    |                              |
+    |                    Evidence Ledger (postgres)
+    |                 (claims, sources, revisions,
+    |                  calculations, hypotheses)
+    |
+    +--> Deterministic Verification Gate
+    |           |   checks current ledger snapshot
+    |           +---- A2A ----> verifier container
+    |                           fresh context, independent MCP HTTP
+    |           <---- typed verification records ----+
+    |           |
+    |           +--> revision and coverage policy
+    |
+    +--> Tool-less Finalizer (only after passing policy)
 ```
+
+**WebSocket contract (one socket per session):**
+
+| Direction | Messages |
+| --- | --- |
+| Client → server | `ask`, `cancel` |
+| Server → client | Stable UI events: `agent.started`, `agent.handoff`, `tool.summary`, `evidence.updated`, `hypothesis.created`, `a2a.verification`, `verification.gate`, `answer.final`, `run.failed` |
+| Both | Heartbeat; reconnect resumes from `last_event_id` without restarting a live run |
+
+Normalize Strands SDK event field names at the `api` boundary. The browser never binds to unverified SDK keys.
 
 **Three separate mechanisms, three distinct reasons:**
 
@@ -79,10 +150,12 @@ The Verifier is **not a Swarm node**. The application invokes it across the A2A 
 | **Investigator** | Local Swarm | Source records, raw measurements, traceable claims, evidence links | Literature, Materials and Research Data MCP. Owns new retrieval and provenance. |
 | **Data Analyst** | Local Swarm | Reproducible calculations, normalized comparisons, uncertainty notes | Ledger + deterministic local calculation tool. Requests missing records with a precise handoff to Investigator; does not independently redo broad research. |
 | **Challenger** | Local Swarm | Alternative hypotheses, methodological objections, contradictions, specific follow-up questions | Ledger and existing evidence. Does not expand the domain or certify sources. |
-| **Independent Verifier** | Remote A2A service | `verification` for current claim revisions, with independent source references | Separate read-only MCP connections and credentials; never receives the Swarm transcript or prior agents' conclusions. Cannot alter research claims. |
-| **Finalizer** | Outside Swarm | Source-grounded final assessment, unresolved limitations | No external tools. Reads a policy-approved ledger snapshot only. |
+| **Independent Verifier** | Remote A2A service (`verifier` container) | `verification` for current claim revisions, with independent source references | Separate read-only MCP connections and credentials; never receives the Swarm transcript or prior agents' conclusions. Cannot alter research claims. |
+| **Finalizer** | Outside Swarm, in `api` | Source-grounded final assessment, unresolved limitations | No external tools. Reads a policy-approved ledger snapshot only. |
 
 Swarm agents may hand off in different orders depending on findings. **Meaningful collaboration** means that a handoff changes the next agent's task or the ledger—not merely that multiple API calls occurred.
+
+Ledger writes are **local tools** (claim/evidence/hypothesis upsert, snapshot freeze), not free-form Swarm chat. Strands shared working context may carry claim IDs; it is not the Evidence Ledger.
 
 ## Scientific MCP Servers
 
@@ -144,13 +217,11 @@ Illustrative claim (not a scientific assertion):
 
 ## Runtime, Reliability and Security
 
-- Explicit `max_handoffs`, `max_iterations`, `execution_timeout`, node timeouts, and repetitive handoff detection; enforce a **per-question token and cost ceiling**.
+- Explicit `max_handoffs`, `max_iterations`, `execution_timeout`, node timeouts, and repetitive handoff detection; set limits **tighter than SDK defaults** (do not ship `max_handoffs=20` / 15-minute execution). Enforce a **per-question token and cost ceiling**.
 - Each MCP server has defined tool schemas, least-privilege credentials, response validation, rate limiting, timeouts, retry policy and meaningful failure events.
 - Treat titles, abstracts, dataset descriptions and MCP responses as **untrusted data**; defend against prompt injection and prohibit text retrieved from sources from changing permissions or system instructions.
-- Normalize SDK-specific Strands stream events to stable UI events: `agent.started`, `agent.handoff`, `tool.summary`, `evidence.updated`, `hypothesis.created`, `a2a.verification`, `verification.gate`, `answer.final`, `run.failed`.
 - Keep request/run IDs, agent IDs, event ordering, timestamps, cost, token usage, and trace IDs. Store audit trails without exposing private chain-of-thought.
-- Persist session and ledger records with a simple database. API gateway stays thin; no unrelated business microservices, Kafka or Kubernetes solely for architectural decoration.
-- Use **configurable model providers** supported by the selected Strands SDK version. Do not require AWS Bedrock; provider choice must have a documented reason and measurable cost/quality tradeoff.
+- `api` remains a session/run gateway. Compose services exist to isolate Verifier, MCP, and storage — not to justify a mesh.
 
 ## Licensing and Research Integrity
 
@@ -163,6 +234,12 @@ Illustrative claim (not a scientific assertion):
 ## Evaluation: Prove That Multi-Agent Collaboration Helps
 
 Ship repeatable evaluations comparing **the complete Swarm system against one agent using the same MCP tools**, under stated cost and time budgets. Maintain two evaluation modes: reproducible fixture/snapshot-based runs and a live-API demonstration.
+
+Unbundle the comparison so Swarm is not credited for the Verifier:
+
+1. One agent + same MCP, no gate.
+2. One agent + same MCP + A2A gate.
+3. Swarm + A2A gate.
 
 Use a small, carefully curated **gold set** with explicit expected checks (not just broad LLM-as-judge scores):
 
@@ -187,9 +264,9 @@ A successful demo shows:
 2. Investigator calls Literature, Materials and Research Data **MCP** tools and writes traceable source/evidence records.
 3. Data Analyst normalizes units and compares relevant inputs using a **local deterministic calculation tool**; missing data triggers a specific Investigator handoff.
 4. Challenger raises an alternative hypothesis or highlights a methodological gap; the Swarm may revisit investigation autonomously.
-5. The **remote A2A Verifier**, in a separate process, independently re-fetches evidence and emits revision-bound verdicts.
-6. The deterministic gate rejects stale / missing verification; Finalizer displays only supportable conclusions and explicit uncertainties.
-7. The single conversation visibly differentiates **Swarm handoff, MCP call, and A2A verification**, with the final assessment at the top.
+5. The **remote A2A Verifier**, in its own container, independently re-fetches evidence and emits revision-bound verdicts.
+6. The deterministic gate rejects stale / missing verification; the sticky Final Assessment shows only supportable conclusions and explicit uncertainties.
+7. One WebSocket conversation differentiates **Swarm handoff, MCP call, and A2A verification**. The live gold-path hits known records on all three MCP servers (including a PubChem compound and a Zenodo/DataCite dataset PID).
 
 **Scientific guardrail:** A calculated material property is not proof of manufacturing feasibility, operational safety, cost competitiveness or market adoption.
 
@@ -198,7 +275,9 @@ A successful demo shows:
 - **Not** a general clinical/biomedical research platform.
 - **Not** a collection of one-API-per-agent wrappers or a fixed routing Graph disguised as a Swarm.
 - **Not** a generic paper summarizer or another Travel RAG project with different documents.
-- **Not** an excuse to add unused MCP servers, distributed systems or model providers.
+- **Not** an SSE telemetry console (that is NASA MCP) and **not** a chat bubble that is also the final answer (that is Travel RAG).
+- **Not** Kubernetes, Kafka, or unused MCP replicas. Docker Compose is the runtime.
+- **Not** a local LLM stack: Qwen/Ollama/Bedrock are out unless a measured comparison demands them.
 - **Not** a sequence of MVPs; this README describes the **single complete target system**.
 
 ## Primary Technical References
