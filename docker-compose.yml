@@ -1,0 +1,148 @@
+# Named services only. App images are sleep/health stubs until their phases.
+# `docker compose config` must succeed without live Gemini or scientific APIs.
+name: axiom-research
+
+services:
+  web:
+    image: busybox:1.36
+    container_name: axiom-research-web
+    command: ["sleep", "infinity"]
+    ports:
+      - "127.0.0.1:${WEB_PORT:-3200}:3000"
+    healthcheck:
+      test: ["CMD", "true"]
+      interval: 30s
+      timeout: 3s
+      retries: 1
+    networks:
+      - axiom
+    security_opt:
+      - no-new-privileges:true
+
+  api:
+    image: busybox:1.36
+    container_name: axiom-research-api
+    command: ["sleep", "infinity"]
+    ports:
+      - "127.0.0.1:${API_PORT:-8200}:8080"
+    environment:
+      - LLM_PROVIDER=${LLM_PROVIDER:-gemini}
+      - GEMINI_MODEL=${GEMINI_MODEL:-}
+      - SECRETS_ENV_PATH=/config/rag/.env
+      - VERIFIER_URL=${VERIFIER_URL:-http://verifier:9000}
+      - MCP_LITERATURE_URL=${MCP_LITERATURE_URL:-http://mcp-literature:8080}
+      - MCP_MATERIALS_URL=${MCP_MATERIALS_URL:-http://mcp-materials:8080}
+      - MCP_RESEARCH_DATA_URL=${MCP_RESEARCH_DATA_URL:-http://mcp-research-data:8080}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://axiom:axiom@postgres:5432/axiom_research}
+      - SWARM_MAX_HANDOFFS=${SWARM_MAX_HANDOFFS:-8}
+      - SWARM_MAX_ITERATIONS=${SWARM_MAX_ITERATIONS:-8}
+      - SWARM_EXECUTION_TIMEOUT_SECONDS=${SWARM_EXECUTION_TIMEOUT_SECONDS:-180}
+      - SWARM_NODE_TIMEOUT_SECONDS=${SWARM_NODE_TIMEOUT_SECONDS:-45}
+      - SWARM_MAX_TOKENS_PER_RUN=${SWARM_MAX_TOKENS_PER_RUN:-100000}
+      - SWARM_MAX_COST_USD_PER_RUN=${SWARM_MAX_COST_USD_PER_RUN:-1.00}
+    volumes:
+      - ${HOME}/.config/rag:/config/rag:ro
+    networks:
+      - axiom
+    security_opt:
+      - no-new-privileges:true
+
+  verifier:
+    image: busybox:1.36
+    container_name: axiom-research-verifier
+    command: ["sleep", "infinity"]
+    ports:
+      - "127.0.0.1:${VERIFIER_PORT:-8201}:9000"
+    environment:
+      - LLM_PROVIDER=${LLM_PROVIDER:-gemini}
+      - GEMINI_MODEL=${GEMINI_MODEL:-}
+      - SECRETS_ENV_PATH=/config/rag/.env
+      - MCP_LITERATURE_URL=${MCP_LITERATURE_URL:-http://mcp-literature:8080}
+      - MCP_MATERIALS_URL=${MCP_MATERIALS_URL:-http://mcp-materials:8080}
+      - MCP_RESEARCH_DATA_URL=${MCP_RESEARCH_DATA_URL:-http://mcp-research-data:8080}
+    volumes:
+      - ${HOME}/.config/rag:/config/rag:ro
+    networks:
+      - axiom
+    security_opt:
+      - no-new-privileges:true
+
+  mcp-literature:
+    image: busybox:1.36
+    container_name: axiom-research-mcp-literature
+    command: ["sleep", "infinity"]
+    ports:
+      - "127.0.0.1:${MCP_LITERATURE_PORT:-8210}:8080"
+    healthcheck:
+      test: ["CMD", "true"]
+      interval: 30s
+      timeout: 3s
+      retries: 1
+    networks:
+      - axiom
+    security_opt:
+      - no-new-privileges:true
+
+  mcp-materials:
+    image: busybox:1.36
+    container_name: axiom-research-mcp-materials
+    command: ["sleep", "infinity"]
+    ports:
+      - "127.0.0.1:${MCP_MATERIALS_PORT:-8211}:8080"
+    healthcheck:
+      test: ["CMD", "true"]
+      interval: 30s
+      timeout: 3s
+      retries: 1
+    networks:
+      - axiom
+    security_opt:
+      - no-new-privileges:true
+
+  mcp-research-data:
+    image: busybox:1.36
+    container_name: axiom-research-mcp-research-data
+    command: ["sleep", "infinity"]
+    ports:
+      - "127.0.0.1:${MCP_RESEARCH_DATA_PORT:-8212}:8080"
+    healthcheck:
+      test: ["CMD", "true"]
+      interval: 30s
+      timeout: 3s
+      retries: 1
+    networks:
+      - axiom
+    security_opt:
+      - no-new-privileges:true
+
+  postgres:
+    image: ${POSTGRES_IMAGE:-postgres:16}
+    container_name: axiom-research-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-axiom_research}
+      - POSTGRES_USER=${POSTGRES_USER:-axiom}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-axiom}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5434}:5432"
+    networks:
+      - axiom
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\" || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+
+networks:
+  axiom:

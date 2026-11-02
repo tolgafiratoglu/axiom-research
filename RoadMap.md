@@ -32,7 +32,7 @@ Repo, Compose skeleton, config, shared contracts. No agents yet.
 
 ### 0.A Layout and tooling
 
-- [ ] **0.1** Repository layout:
+- [x] **0.1** Repository layout:
 
   ```text
   api/            FastAPI + Swarm + gate + Finalizer
@@ -44,9 +44,9 @@ Repo, Compose skeleton, config, shared contracts. No agents yet.
   tests/          unit/integration (no live LLM/API)
   ```
 
-- [ ] **0.2** Python package metadata (`pyproject.toml`, import `axiom_research`), ruff/pytest, Node workspace for `web` (`name: axiom-research`).
-- [ ] **0.3** `.env.example`: `LLM_PROVIDER=gemini`, `GEMINI_MODEL` (operator-chosen supported Flash ID; no retired default), `SECRETS_ENV_PATH=~/.config/rag/.env`, service URLs, Swarm budget defaults. Comment the Google AI for Developers model list; as of 2026-10-30 `gemini-3.5-flash` is deprecated and routed to `gemini-3.6-flash`.
-- [ ] **0.4** Root `docker-compose.yml` with `name: axiom-research` and **named services only** (can be `sleep`/health stubs): `web`, `api`, `verifier`, `mcp-literature`, `mcp-materials`, `mcp-research-data`, `postgres`.
+- [x] **0.2** Python package metadata (`pyproject.toml`, import `axiom_research`), ruff/pytest, Node workspace for `web` (`name: axiom-research`).
+- [x] **0.3** `.env.example`: `LLM_PROVIDER=gemini`, `GEMINI_MODEL` (operator-chosen supported Flash ID; no retired default), `SECRETS_ENV_PATH=~/.config/rag/.env`, service URLs, Swarm budget defaults. Comment the Google AI for Developers model list; as of 2026-10-30 `gemini-3.5-flash` is deprecated and routed to `gemini-3.6-flash`.
+- [x] **0.4** Root `docker-compose.yml` with `name: axiom-research` and **named services only** (can be `sleep`/health stubs): `web`, `api`, `verifier`, `mcp-literature`, `mcp-materials`, `mcp-research-data`, `postgres`.
 
 ### 0.B Shared contracts
 

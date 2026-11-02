@@ -1,0 +1,5 @@
+{
+  "name": "axiom-research",
+  "private": true,
+  "workspaces": ["web"]
+}
