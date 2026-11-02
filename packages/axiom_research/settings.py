@@ -41,6 +41,10 @@ class Settings(BaseSettings):
     gemini_model: str = ""
     secrets_env_path: str = "~/.config/rag/.env"
     database_url: str = "postgresql://axiom:axiom@127.0.0.1:5434/axiom_research"
+    # Host defaults for local Swarm MCP clients (Compose publishes 8210–8212).
+    mcp_literature_url: str = "http://127.0.0.1:8210"
+    mcp_materials_url: str = "http://127.0.0.1:8211"
+    mcp_research_data_url: str = "http://127.0.0.1:8212"
     # Operator-overridable Flash pricing for Swarm token/cost accounting (USD / 1M tokens).
     gemini_input_usd_per_mtok: float = 0.30
     gemini_output_usd_per_mtok: float = 2.50

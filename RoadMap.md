@@ -145,10 +145,10 @@ Exploratory collaboration inside `api`. No Verifier, no UI.
 
 ### 3.B Agents and tools
 
-- [ ] **3.3** Research Planner: no MCP, no ledger writes except perhaps run scope; one-shot handoff; not a per-hop supervisor.
-- [ ] **3.4** Investigator: literature + materials + research-data MCP clients; owns retrieval + provenance writes.
-- [ ] **3.5** Data Analyst: **no MCP**; ledger read + deterministic local calculation tool; precise Investigator handoff when records are missing.
-- [ ] **3.6** Challenger: ledger only; writes hypotheses / contradictions; does not expand domain or certify sources.
+- [x] **3.3** Research Planner: no MCP, no ledger writes except perhaps run scope; one-shot handoff; not a per-hop supervisor.
+- [x] **3.4** Investigator: literature + materials + research-data MCP clients; owns retrieval + provenance writes.
+- [x] **3.5** Data Analyst: **no MCP**; ledger read + deterministic local calculation tool; precise Investigator handoff when records are missing.
+- [x] **3.6** Challenger: ledger only; writes hypotheses / contradictions; does not expand domain or certify sources.
 
 ### 3.C Swarm runtime
 
