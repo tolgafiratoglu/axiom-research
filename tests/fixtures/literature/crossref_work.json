@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "message-type": "work",
+  "message": {
+    "DOI": "10.7717/peerj.4375",
+    "title": ["The state of OA: a large-scale analysis of Open Access articles"],
+    "type": "journal-article",
+    "container-title": ["PeerJ"],
+    "published-print": {"date-parts": [[2018, 2, 13]]},
+    "publisher": "PeerJ",
+    "is-referenced-by-count": 42,
+    "URL": "https://doi.org/10.7717/peerj.4375",
+    "ISSN": ["2167-8359"],
+    "member": "4443"
+  }
+}

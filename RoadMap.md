@@ -80,16 +80,16 @@ Real tools, HTTP transport, Docker. Empty servers are not allowed.
 
 ### 1.A Transport and server skeleton
 
-- [ ] **1.1** MCP HTTP/streamable server skeleton (one shared runner used by all three).
-- [ ] **1.2** Auth, timeout, retry, schema validation, rate-limit, structured errors. Treat payloads as untrusted.
-- [ ] **1.3** Policy: metadata only — no PDF/abstract bulk download, no vector index.
+- [x] **1.1** MCP HTTP/streamable server skeleton (one shared runner used by all three).
+- [x] **1.2** Timeout, retry, schema validation, rate-limit, structured errors. Treat payloads as untrusted. No product auth on MCP/api/web.
+- [x] **1.3** Policy: metadata only — no PDF/abstract bulk download, no vector index.
 
 ### 1.B `mcp-literature`
 
-- [ ] **1.4** OpenAlex: search works, citation relationships, identifiers.
-- [ ] **1.5** Crossref: DOI metadata resolve.
-- [ ] **1.6** arXiv: preprint vs later publication distinction.
-- [ ] **1.7** Fixture tests for each tool (recorded JSON). Distinct purpose of the three APIs documented on the tool descriptions.
+- [x] **1.4** OpenAlex: search works, citation relationships, identifiers.
+- [x] **1.5** Crossref: DOI metadata resolve.
+- [x] **1.6** arXiv: preprint vs later publication distinction.
+- [x] **1.7** Fixture tests for each tool (recorded JSON). Distinct purpose of the three APIs documented on the tool descriptions.
 
 ### 1.C `mcp-materials`
 
@@ -241,7 +241,7 @@ Production-shaped, still Compose-only.
 - [ ] **7.1** Prompt-injection tests: hostile abstract/title cannot change instructions or tool permissions.
 - [ ] **7.2** MCP outage / 429 / timeout → `tool.summary` failure + gate-safe outcome, no fabricated sources.
 - [ ] **7.3** Health: `api` liveness/readiness (Postgres + MCP reachability; Gemini is not a readiness blocker).
-- [ ] **7.4** Least-privilege credentials per MCP container; keys not in images.
+- [ ] **7.4** Provider API keys (e.g. Materials Project) only via secrets mount; not in images. No product auth layer.
 - [ ] **7.5** Run/trace IDs, latency, token cost on events (no private CoT stored).
 - [ ] **7.6** Compose `up` from a clean checkout documented in README (ports, env, Materials Project key).
 

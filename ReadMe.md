@@ -151,7 +151,7 @@ The Verifier is **not a Swarm node**. The application invokes it across the A2A 
 | **Investigator** | Local Swarm | Source records, raw measurements, traceable claims, evidence links | Literature, Materials and Research Data MCP. Owns new retrieval and provenance. |
 | **Data Analyst** | Local Swarm | Reproducible calculations, normalized comparisons, uncertainty notes | Ledger + deterministic local calculation tool. Requests missing records with a precise handoff to Investigator; does not independently redo broad research. |
 | **Challenger** | Local Swarm | Alternative hypotheses, methodological objections, contradictions, specific follow-up questions | Ledger and existing evidence. Does not expand the domain or certify sources. |
-| **Independent Verifier** | Remote A2A service (`verifier` container) | `verification` for current claim revisions, with independent source references | Separate read-only MCP connections and credentials; never receives the Swarm transcript or prior agents' conclusions. Cannot alter research claims. |
+| **Independent Verifier** | Remote A2A service (`verifier` container) | `verification` for current claim revisions, with independent source references | Separate read-only MCP clients (and provider API keys where required); never receives the Swarm transcript or prior agents' conclusions. Cannot alter research claims. |
 | **Finalizer** | Outside Swarm, in `api` | Source-grounded final assessment, unresolved limitations | No external tools. Reads a policy-approved ledger snapshot only. |
 
 Swarm agents may hand off in different orders depending on findings. **Meaningful collaboration** means that a handoff changes the next agent's task or the ledger—not merely that multiple API calls occurred.
@@ -219,7 +219,7 @@ Illustrative claim (not a scientific assertion):
 ## Runtime, Reliability and Security
 
 - Explicit `max_handoffs`, `max_iterations`, `execution_timeout`, node timeouts, and repetitive handoff detection; set limits **tighter than SDK defaults** (do not ship `max_handoffs=20` / 15-minute execution). Enforce a **per-question token and cost ceiling**.
-- Each MCP server has defined tool schemas, least-privilege credentials, response validation, rate limiting, timeouts, retry policy and meaningful failure events.
+- Each MCP server has defined tool schemas, response validation, rate limiting, timeouts, retry policy and meaningful failure events. Provider API keys stay in the secrets file / mounts, not in images. There is **no product auth** layer on MCP, `api`, or `web` (Compose binds localhost).
 - Treat titles, abstracts, dataset descriptions and MCP responses as **untrusted data**; defend against prompt injection and prohibit text retrieved from sources from changing permissions or system instructions.
 - Keep request/run IDs, agent IDs, event ordering, timestamps, cost, token usage, and trace IDs. Store audit trails without exposing private chain-of-thought.
 - `api` remains a session/run gateway. Compose services exist to isolate Verifier, MCP, and storage — not to justify a mesh.

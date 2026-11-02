@@ -4,6 +4,8 @@
 ``GEMINI_API_KEY`` is read only from ``SECRETS_ENV_PATH``
 (``~/.config/rag/.env``). It is not an env-backed Settings field, so a
 project ``.env`` or process ``GEMINI_API_KEY`` is ignored.
+
+There is no product auth token for MCP/api/web.
 """
 
 from pathlib import Path
@@ -13,11 +15,15 @@ from dotenv import dotenv_values
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-def load_gemini_api_key(secrets_env_path: str) -> str:
+def load_secret(secrets_env_path: str, name: str) -> str:
     path = Path(secrets_env_path).expanduser()
     if not path.is_file():
         return ""
-    return (dotenv_values(path).get("GEMINI_API_KEY") or "").strip()
+    return (dotenv_values(path).get(name) or "").strip()
+
+
+def load_gemini_api_key(secrets_env_path: str) -> str:
+    return load_secret(secrets_env_path, "GEMINI_API_KEY")
 
 
 class Settings(BaseSettings):

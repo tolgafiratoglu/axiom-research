@@ -8,11 +8,22 @@ dependencies = [
     "pydantic-settings>=2.0",
     "python-dotenv>=1.0",
     "google-genai>=1.0",
+    "mcp[cli]>=2,<3",
+    "httpx2>=2.5.0",
+    "websockets>=13,<17",
+    "starlette>=0.40",
+    "uvicorn[standard]>=0.32",
 ]
+
+[project.scripts]
+axiom-mcp-literature = "axiom_research.mcp.servers.literature:main"
+axiom-mcp-materials = "axiom_research.mcp.servers.materials:main"
+axiom-mcp-research-data = "axiom_research.mcp.servers.research_data:main"
 
 [project.optional-dependencies]
 dev = [
     "pytest>=8",
+    "pytest-asyncio",
     "ruff>=0.6",
 ]
 
@@ -27,6 +38,7 @@ packages = ["packages/axiom_research"]
 "packages" = ""
 
 [tool.pytest.ini_options]
+asyncio_mode = "auto"
 testpaths = ["tests"]
 pythonpath = ["packages"]
 

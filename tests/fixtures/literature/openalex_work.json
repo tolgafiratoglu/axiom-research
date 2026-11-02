@@ -1,0 +1,17 @@
+{
+  "id": "https://openalex.org/W2741809807",
+  "doi": "https://doi.org/10.7717/peerj.4375",
+  "title": "The state of OA: a large-scale analysis of Open Access articles",
+  "publication_year": 2018,
+  "type": "article",
+  "cited_by_count": 42,
+  "referenced_works": ["https://openalex.org/W123"],
+  "related_works": ["https://openalex.org/W789"],
+  "ids": {
+    "openalex": "https://openalex.org/W2741809807",
+    "doi": "https://doi.org/10.7717/peerj.4375"
+  },
+  "primary_location": {
+    "landing_page_url": "https://peerj.com/articles/4375/"
+  }
+}
