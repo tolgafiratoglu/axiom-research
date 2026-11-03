@@ -93,6 +93,58 @@ PubChem, Zenodo, DataCite) stay outside the compose file, same as Gemini.
 
 MCP servers are Docker services because agent ≠ API and because STDIO subprocesses do not cross container boundaries. `api` and `verifier` open **independent MCP clients** to the same three servers; they do not share a Swarm transcript. Do not duplicate MCP containers just to look more distributed.
 
+### Local Compose bring-up (clean checkout)
+
+Repeatable operator path from an empty working tree. No product auth; all published ports bind to `127.0.0.1`.
+
+**Prerequisites:** Docker Compose v2, Python 3.11+ (host `.venv` for unit tests / live smoke), Node 20+ only if you run `web` outside Compose.
+
+1. **Project env (non-secret)** — copy [`.env.example`](./.env.example) to `.env` in the repo root. Set `GEMINI_MODEL` to a currently supported Flash ID. Leave Compose service URLs and host ports at the defaults unless you have a conflict.
+2. **Secrets file (keys only)** — create `~/.config/rag/.env` (same file as Travel RAG / NASA MCP). Compose mounts `${HOME}/.config/rag` read-only at `/config/rag` for `api`, `verifier`, and `mcp-materials`. Put keys **here only** — never in project `.env`, process env, or image layers:
+
+   ```bash
+   mkdir -p ~/.config/rag
+   # Edit ~/.config/rag/.env (chmod 600 recommended):
+   #   GEMINI_API_KEY=<from Google AI Studio / Gemini API>
+   #   MP_API_KEY=<from https://next-gen.materialsproject.org/api>
+   ```
+
+   Without `GEMINI_API_KEY`, Swarm / Verifier / Finalizer model calls fail closed. Without `MP_API_KEY`, `mcp-materials` still serves `/health`, but Materials Project tools return a clear configuration error (PubChem and the other MCP servers do not require that key).
+3. **Bring the stack up:**
+
+   ```bash
+   docker compose config          # validate; no network to Gemini or scientific APIs
+   docker compose up -d --build
+   ```
+
+4. **Published ports** (defaults from `.env.example`; override via `WEB_PORT`, `API_PORT`, …):
+
+   | Host (`127.0.0.1`) | Service | Notes |
+   | --- | --- | --- |
+   | `3200` | `web` | UI (Compose stub until the Next image is wired; host `npm run dev` in `web/` is fine for UI work) |
+   | `8200` | `api` | WebSocket `ws://127.0.0.1:8200/ws/session` (`NEXT_PUBLIC_WS_URL`) |
+   | `8201` | `verifier` | A2A agent card / health on container port 9000 |
+   | `8210` | `mcp-literature` | `GET /health` |
+   | `8211` | `mcp-materials` | `GET /health` (needs secrets mount for MP tools) |
+   | `8212` | `mcp-research-data` | `GET /health` |
+   | `5434` | `postgres` | Host-side `DATABASE_URL=postgresql://axiom:axiom@127.0.0.1:5434/axiom_research` |
+
+5. **Quick checks (operator):**
+
+   ```bash
+   curl -sf http://127.0.0.1:8210/health
+   curl -sf http://127.0.0.1:8211/health
+   curl -sf http://127.0.0.1:8212/health
+   curl -sf http://127.0.0.1:8201/.well-known/agent-card.json
+   # When api is no longer a Compose stub:
+   # curl -sf http://127.0.0.1:8200/health/live
+   # curl -sf http://127.0.0.1:8200/health/ready
+   ```
+
+6. **Optional live MCP smoke** (not CI; hits real scientific APIs once): after MCP containers are up and `MP_API_KEY` is in the secrets file, run `.venv/bin/python scripts/mcp_live_smoke.py`.
+
+`docker compose down` stops containers; add `-v` only if you intend to wipe the Postgres volume.
+
 ## Architecture
 
 ```text

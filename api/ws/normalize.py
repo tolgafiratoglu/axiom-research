@@ -17,7 +17,9 @@ from axiom_research.events import (
     ServerMessage,
     ToolSummary,
 )
+from api.telemetry import stamp_telemetry
 from axiom_research.identities import AgentId
+from axiom_research.mcp.failures import tool_failure_summary
 
 # Ledger tool names that surface as evidence/hypothesis UI events (not raw JSON).
 _EVIDENCE_TOOLS = frozenset(
@@ -105,6 +107,7 @@ def normalize_multiagent_event(
     session_id: str,
     run_id: str,
     tool_names_by_id: dict[str, str] | None = None,
+    trace_id: str | None = None,
 ) -> list[ServerMessage]:
     """Convert one SDK stream dict into zero or more stable ServerMessage values."""
     if not isinstance(raw, dict):
@@ -114,6 +117,21 @@ def normalize_multiagent_event(
     ts = _now()
     out: list[ServerMessage] = []
     names = tool_names_by_id if tool_names_by_id is not None else {}
+
+    def _finish(events: list[ServerMessage]) -> list[ServerMessage]:
+        if not trace_id:
+            return events
+        return [stamp_telemetry(event, trace_id=trace_id) for event in events]
+
+    # Never surface raw SDK reasoning / private CoT blobs as UI events.
+    if sdk_type == "multiagent_node_stream":
+        inner = raw.get("event")
+        if isinstance(inner, dict) and inner.get("type") in {
+            "reasoning",
+            "thinking",
+            "chain_of_thought",
+        }:
+            return []
 
     # Track toolUse id → name for later toolResult blocks.
     if sdk_type == "multiagent_node_stream":
@@ -144,7 +162,7 @@ def normalize_multiagent_event(
                 agent_id=agent,
             )
         )
-        return out
+        return _finish(out)
 
     if sdk_type == "multiagent_handoff":
         from_ids = raw.get("from_node_ids") or []
@@ -167,7 +185,7 @@ def normalize_multiagent_event(
                 reason=str(reason) if reason else None,
             )
         )
-        return out
+        return _finish(out)
 
     if sdk_type == "multiagent_node_stream":
         inner = raw.get("event")
@@ -193,6 +211,22 @@ def normalize_multiagent_event(
                         parts.append(str(item["text"]))
                 summary = " ".join(parts).strip() or f"{name or 'tool'} {status}"
                 if not name or name in _SKIP_TOOL_SUMMARY:
+                    continue
+                # 7.2: failed MCP/tool calls never become evidence/hypothesis rows
+                # (no fabricated sources from error payloads).
+                if not ok:
+                    out.append(
+                        ToolSummary(
+                            event_id="",
+                            ts=ts,
+                            session_id=session_id,
+                            run_id=run_id,
+                            agent_id=agent,
+                            tool_name=name,
+                            summary=tool_failure_summary(name, summary)[:400],
+                            ok=False,
+                        )
+                    )
                     continue
                 if name in _HYPOTHESIS_TOOLS:
                     payload = _parse_jsonish(summary) or {}
@@ -253,7 +287,7 @@ def normalize_multiagent_event(
                             ok=ok,
                         )
                     )
-        return out
+        return _finish(out)
 
     if sdk_type == "result":
         result = raw.get("result")
@@ -269,7 +303,7 @@ def normalize_multiagent_event(
                     reason="run.failed: swarm stopped",
                 )
             )
-        return out
+        return _finish(out)
 
-    # Drop raw SDK noise (node_stop, init_event_loop, token deltas, …).
+    # Drop raw SDK noise (node_stop, init_event_loop, token deltas, private CoT, …).
     return []

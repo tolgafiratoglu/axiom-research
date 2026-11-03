@@ -6,6 +6,7 @@ import itertools
 from datetime import UTC, datetime
 from typing import Any
 
+from api.telemetry import assert_no_private_cot, scrub_private_cot
 from axiom_research.events import SERVER_ADAPTER, ServerMessage
 
 
@@ -20,6 +21,9 @@ class EventLog:
             payload = event.model_dump(mode="json")
         else:
             payload = dict(event)
+        payload = scrub_private_cot(payload)
+        assert isinstance(payload, dict)
+        assert_no_private_cot(payload)
         if "event_id" not in payload or not payload["event_id"]:
             payload["event_id"] = f"evt-{next(self._ids)}"
         if "ts" not in payload:

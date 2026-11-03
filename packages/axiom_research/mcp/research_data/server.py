@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
-from typing import Annotated
+from typing import Annotated, Any
 
 import httpx2
 from mcp.server import MCPServer
@@ -13,9 +13,9 @@ from pydantic import Field
 
 from axiom_research.mcp.errors import McpRuntimeError
 from axiom_research.mcp.research_data.datacite import DataCiteClient
-from axiom_research.mcp.research_data.models import DataCiteDoi, ZenodoRecord, ZenodoSearchResult
 from axiom_research.mcp.research_data.zenodo import ZenodoClient
 from axiom_research.mcp.upstream import DEFAULT_TIMEOUT, UpstreamClient
+from axiom_research.untrusted import prepare_tool_result
 
 HttpFactory = Callable[[], httpx2.AsyncClient]
 
@@ -70,14 +70,14 @@ def _register_tools(mcp: MCPServer) -> None:
             str,
             Field(description="Zenodo record id or 10.5281/zenodo.… DOI"),
         ],
-    ) -> ZenodoRecord:
+    ) -> dict[str, Any]:
         """Zenodo: deposited record metadata (version, license, concept id).
 
         Deposit-site metadata. Does not download files. For independent PID
         resolve use datacite_resolve_doi (Verifier path).
         """
         try:
-            return await _app(ctx).zenodo.get_record(record_id)
+            return prepare_tool_result(await _app(ctx).zenodo.get_record(record_id))
         except McpRuntimeError as exc:
             raise _tool_error(exc) from exc
 
@@ -86,10 +86,12 @@ def _register_tools(mcp: MCPServer) -> None:
         ctx: Context[ResearchDataContext],
         query: Annotated[str, Field(description="Zenodo search query")],
         size: Annotated[int, Field(description="Page size (1-25).", ge=1, le=25)] = 5,
-    ) -> ZenodoSearchResult:
+    ) -> dict[str, Any]:
         """Zenodo: search deposited records. Metadata only; no file harvest."""
         try:
-            return await _app(ctx).zenodo.search_records(query, size=size)
+            return prepare_tool_result(
+                await _app(ctx).zenodo.search_records(query, size=size)
+            )
         except McpRuntimeError as exc:
             raise _tool_error(exc) from exc
 
@@ -97,14 +99,14 @@ def _register_tools(mcp: MCPServer) -> None:
     async def datacite_resolve_doi(
         ctx: Context[ResearchDataContext],
         doi: Annotated[str, Field(description="Dataset or other DOI to resolve")],
-    ) -> DataCiteDoi:
+    ) -> dict[str, Any]:
         """DataCite: independently resolve a PID and its registered metadata.
 
         Verifier path for dataset DOIs. Not the Zenodo deposit API — use this
         to re-check a DOI Investigator found via Zenodo without sharing Swarm context.
         """
         try:
-            return await _app(ctx).datacite.resolve_doi(doi)
+            return prepare_tool_result(await _app(ctx).datacite.resolve_doi(doi))
         except McpRuntimeError as exc:
             raise _tool_error(exc) from exc
 
@@ -125,7 +127,9 @@ def _app(ctx: Context[ResearchDataContext]) -> ResearchDataContext:
 
 
 def _tool_error(exc: McpRuntimeError) -> Exception:
-    return Exception(
+    from mcp.server.mcpserver.exceptions import ToolError
+
+    return ToolError(
         f"Research-data MCP error: {exc.message} "
         f"(type={exc.error_type}, retryable={exc.retryable})"
     )

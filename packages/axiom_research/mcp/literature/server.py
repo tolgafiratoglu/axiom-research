@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
-from typing import Annotated
+from typing import Annotated, Any
 
 import httpx2
 from mcp.server import MCPServer
@@ -14,9 +14,10 @@ from pydantic import Field
 from axiom_research.mcp.errors import McpRuntimeError
 from axiom_research.mcp.literature.arxiv import ArxivClient
 from axiom_research.mcp.literature.crossref import CrossrefClient
-from axiom_research.mcp.literature.models import ArxivRecord, CrossrefWork, OpenAlexSearchResult, OpenAlexWorkSummary
+from axiom_research.mcp.literature.models import OpenAlexSearchResult, OpenAlexWorkSummary
 from axiom_research.mcp.literature.openalex import OpenAlexClient
 from axiom_research.mcp.upstream import DEFAULT_TIMEOUT, UpstreamClient
+from axiom_research.untrusted import prepare_tool_result
 
 HttpFactory = Callable[[], httpx2.AsyncClient]
 
@@ -72,14 +73,17 @@ def _register_tools(mcp: MCPServer) -> None:
         ctx: Context[LiteratureContext],
         query: Annotated[str, Field(description="Free-text bibliographic search query.")],
         per_page: Annotated[int, Field(description="Result page size (1-25).", ge=1, le=25)] = 5,
-    ) -> OpenAlexSearchResult:
+    ) -> dict[str, Any]:
         """OpenAlex: discover works, citation relationships, and identifiers.
 
         Use for search and citation graph. Not the Crossref DOI registry of record.
-        Returns metadata only (no abstracts/PDFs).
+        Returns metadata only (no abstracts/PDFs). Titles are untrusted text.
         """
         try:
-            return await _app(ctx).openalex.search_works(query, per_page=per_page)
+            result: OpenAlexSearchResult = await _app(ctx).openalex.search_works(
+                query, per_page=per_page
+            )
+            return prepare_tool_result(result)
         except McpRuntimeError as exc:
             raise _tool_error(exc) from exc
 
@@ -90,13 +94,14 @@ def _register_tools(mcp: MCPServer) -> None:
             str,
             Field(description="OpenAlex work id (W…) or doi:… / https://openalex.org/W…"),
         ],
-    ) -> OpenAlexWorkSummary:
+    ) -> dict[str, Any]:
         """OpenAlex: fetch one work with identifiers and citation links.
 
         Prefer Crossref for authoritative DOI deposit metadata.
         """
         try:
-            return await _app(ctx).openalex.get_work(work_id)
+            result: OpenAlexWorkSummary = await _app(ctx).openalex.get_work(work_id)
+            return prepare_tool_result(result)
         except McpRuntimeError as exc:
             raise _tool_error(exc) from exc
 
@@ -104,13 +109,13 @@ def _register_tools(mcp: MCPServer) -> None:
     async def crossref_resolve_doi(
         ctx: Context[LiteratureContext],
         doi: Annotated[str, Field(description="DOI, bare or https://doi.org/…")],
-    ) -> CrossrefWork:
+    ) -> dict[str, Any]:
         """Crossref: resolve a DOI to publisher registry metadata.
 
         Use for authoritative deposit metadata for a known DOI. Not a discovery search.
         """
         try:
-            return await _app(ctx).crossref.resolve_doi(doi)
+            return prepare_tool_result(await _app(ctx).crossref.resolve_doi(doi))
         except McpRuntimeError as exc:
             raise _tool_error(exc) from exc
 
@@ -121,14 +126,14 @@ def _register_tools(mcp: MCPServer) -> None:
             str,
             Field(description="arXiv id, e.g. 2101.00001 or arxiv:2101.00001"),
         ],
-    ) -> ArxivRecord:
+    ) -> dict[str, Any]:
         """arXiv: preprint metadata and later-publication signals (journal_ref/DOI).
 
         Always a preprint source. journal_ref/DOI is a later-publication signal,
         not proof of peer review by itself. Prefer Crossref for published DOI records.
         """
         try:
-            return await _app(ctx).arxiv.get_preprint(arxiv_id)
+            return prepare_tool_result(await _app(ctx).arxiv.get_preprint(arxiv_id))
         except McpRuntimeError as exc:
             raise _tool_error(exc) from exc
 
@@ -148,7 +153,9 @@ def _app(ctx: Context[LiteratureContext]) -> LiteratureContext:
 
 
 def _tool_error(exc: McpRuntimeError) -> Exception:
-    return Exception(
+    from mcp.server.mcpserver.exceptions import ToolError
+
+    return ToolError(
         f"Literature MCP error: {exc.message} "
         f"(type={exc.error_type}, retryable={exc.retryable})"
     )

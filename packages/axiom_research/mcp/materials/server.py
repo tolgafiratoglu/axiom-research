@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
-from typing import Annotated
+from typing import Annotated, Any
 
 import httpx2
 from mcp.server import MCPServer
@@ -13,14 +13,10 @@ from pydantic import Field
 
 from axiom_research.mcp.errors import McpRuntimeError
 from axiom_research.mcp.materials.materials_project import MaterialsProjectClient
-from axiom_research.mcp.materials.models import (
-    MaterialsProjectRecord,
-    MaterialsProjectSearchResult,
-    PubChemCompound,
-)
 from axiom_research.mcp.materials.pubchem import PubChemClient
 from axiom_research.mcp.upstream import DEFAULT_TIMEOUT, UpstreamClient
-from axiom_research.settings import load_mp_api_key, settings
+from axiom_research.settings import settings
+from axiom_research.untrusted import prepare_tool_result
 
 HttpFactory = Callable[[], httpx2.AsyncClient]
 
@@ -45,7 +41,12 @@ def create_materials_server(
     @asynccontextmanager
     async def lifespan(_server: MCPServer) -> AsyncIterator[MaterialsContext]:
         # Empty key: process still serves /health; MP tools fail until secrets mount.
-        key = mp_api_key if mp_api_key is not None else load_mp_api_key(settings.secrets_env_path)
+        # Never read MP_API_KEY from process env / project .env / image layers.
+        key = (
+            mp_api_key
+            if mp_api_key is not None
+            else settings.mp_api_key
+        )
         http = (
             http_factory()
             if http_factory is not None
@@ -82,14 +83,14 @@ def _register_tools(mcp: MCPServer) -> None:
     async def materials_project_get_material(
         ctx: Context[MaterialsContext],
         material_id: Annotated[str, Field(description="Materials Project id, e.g. mp-149")],
-    ) -> MaterialsProjectRecord:
+    ) -> dict[str, Any]:
         """Materials Project: fetch one computed materials summary by material_id.
 
         Returns DFT-computed properties with units and limitations.
         Never experimental. Not PubChem compound metadata.
         """
         try:
-            return await _mp(ctx).get_material(material_id)
+            return prepare_tool_result(await _mp(ctx).get_material(material_id))
         except McpRuntimeError as exc:
             raise _tool_error(exc) from exc
 
@@ -98,13 +99,15 @@ def _register_tools(mcp: MCPServer) -> None:
         ctx: Context[MaterialsContext],
         formula: Annotated[str, Field(description="Pretty formula, e.g. LiFePO4 or Si")],
         limit: Annotated[int, Field(description="Max rows (1-25).", ge=1, le=25)] = 5,
-    ) -> MaterialsProjectSearchResult:
+    ) -> dict[str, Any]:
         """Materials Project: search computed summaries by chemical formula.
 
         Computed properties only (band gap, formation energy, …). Not lab measurements.
         """
         try:
-            return await _mp(ctx).search_by_formula(formula, limit=limit)
+            return prepare_tool_result(
+                await _mp(ctx).search_by_formula(formula, limit=limit)
+            )
         except McpRuntimeError as exc:
             raise _tool_error(exc) from exc
 
@@ -113,16 +116,16 @@ def _register_tools(mcp: MCPServer) -> None:
         ctx: Context[MaterialsContext],
         cid: Annotated[int | None, Field(description="PubChem CID")] = None,
         name: Annotated[str | None, Field(description="Compound name if CID unknown")] = None,
-    ) -> PubChemCompound:
+    ) -> dict[str, Any]:
         """PubChem PUG REST: compound registry metadata (formula, InChIKey, …).
 
         Chemical identity metadata. Not Materials Project DFT crystal properties.
         """
         try:
             if cid is not None:
-                return await _app(ctx).pubchem.get_by_cid(cid)
+                return prepare_tool_result(await _app(ctx).pubchem.get_by_cid(cid))
             if name and name.strip():
-                return await _app(ctx).pubchem.get_by_name(name)
+                return prepare_tool_result(await _app(ctx).pubchem.get_by_name(name))
             raise McpRuntimeError("VALIDATION", "provide cid or name")
         except McpRuntimeError as exc:
             raise _tool_error(exc) from exc
@@ -144,7 +147,9 @@ def _app(ctx: Context[MaterialsContext]) -> MaterialsContext:
 
 
 def _tool_error(exc: McpRuntimeError) -> Exception:
-    return Exception(
+    from mcp.server.mcpserver.exceptions import ToolError
+
+    return ToolError(
         f"Materials MCP error: {exc.message} "
         f"(type={exc.error_type}, retryable={exc.retryable})"
     )

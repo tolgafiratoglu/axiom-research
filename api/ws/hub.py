@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import asyncio
+import time
 import uuid
 from collections.abc import AsyncIterator, Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 
+from api.telemetry import build_run_metrics, new_trace_id, stamp_telemetry
 from api.ws.events_log import EventLog
 from api.ws.normalize import normalize_multiagent_event
 from axiom_research.events import RunFailed, ServerHeartbeat, ServerMessage
@@ -30,6 +32,7 @@ class RunContext:
     cfg: Settings | None = None
     # Injected Verifier client (mock in tests; live A2A in operator runs).
     verifier_client: Any | None = None
+    trace_id: str = ""
 
 
 RunFactory = Callable[[RunContext], AsyncIterator[ServerMessage]]
@@ -54,13 +57,19 @@ async def default_swarm_run_factory(ctx: RunContext) -> AsyncIterator[ServerMess
     from api.ledger.tools import LedgerTools
     from api.swarm.runtime import build_research_swarm
 
+    trace_id = ctx.trace_id or new_trace_id()
+    started = time.perf_counter()
+
     if ctx.cancel.is_set():
-        yield RunFailed(
-            event_id="",
-            ts=datetime.now(tz=UTC),
-            session_id=ctx.session_id,
-            run_id=ctx.run_id,
-            reason="cancelled",
+        yield stamp_telemetry(
+            RunFailed(
+                event_id="",
+                ts=datetime.now(tz=UTC),
+                session_id=ctx.session_id,
+                run_id=ctx.run_id,
+                reason="cancelled",
+            ),
+            trace_id=trace_id,
         )
         return
 
@@ -75,12 +84,15 @@ async def default_swarm_run_factory(ctx: RunContext) -> AsyncIterator[ServerMess
     tool_names_by_id: dict[str, str] = {}
     async for raw in swarm.stream_async(question):
         if ctx.cancel.is_set():
-            yield RunFailed(
-                event_id="",
-                ts=datetime.now(tz=UTC),
-                session_id=ctx.session_id,
-                run_id=ctx.run_id,
-                reason="cancelled",
+            yield stamp_telemetry(
+                RunFailed(
+                    event_id="",
+                    ts=datetime.now(tz=UTC),
+                    session_id=ctx.session_id,
+                    run_id=ctx.run_id,
+                    reason="cancelled",
+                ),
+                trace_id=trace_id,
             )
             return
         if not isinstance(raw, dict):
@@ -90,16 +102,29 @@ async def default_swarm_run_factory(ctx: RunContext) -> AsyncIterator[ServerMess
             session_id=ctx.session_id,
             run_id=ctx.run_id,
             tool_names_by_id=tool_names_by_id,
+            trace_id=trace_id,
         ):
             yield event
 
+    latency_ms = max(0, int((time.perf_counter() - started) * 1000))
+    yield build_run_metrics(
+        tracker,
+        session_id=ctx.session_id,
+        run_id=ctx.run_id,
+        trace_id=trace_id,
+        latency_ms=latency_ms,
+    )
+
     if tracker.exceeded_reason:
-        yield RunFailed(
-            event_id="",
-            ts=datetime.now(tz=UTC),
-            session_id=ctx.session_id,
-            run_id=ctx.run_id,
-            reason=tracker.exceeded_reason,
+        yield stamp_telemetry(
+            RunFailed(
+                event_id="",
+                ts=datetime.now(tz=UTC),
+                session_id=ctx.session_id,
+                run_id=ctx.run_id,
+                reason=tracker.exceeded_reason,
+            ),
+            trace_id=trace_id,
         )
         # Still attempt gate on budget stop when a Verifier client is wired.
         # (No confident Finalizer if gate fails.)
@@ -115,7 +140,7 @@ async def default_swarm_run_factory(ctx: RunContext) -> AsyncIterator[ServerMess
             client=ctx.verifier_client,
         )
         for event in gate.events:
-            yield event
+            yield stamp_telemetry(event, trace_id=trace_id)
             if event.type == "run.failed":
                 return
         final = run_finalizer(
@@ -124,7 +149,7 @@ async def default_swarm_run_factory(ctx: RunContext) -> AsyncIterator[ServerMess
             run_id=ctx.run_id,
         )
         for event in final.events:
-            yield event
+            yield stamp_telemetry(event, trace_id=trace_id)
 
 
 @dataclass
@@ -211,6 +236,7 @@ class SessionHub:
         return True
 
     async def _run(self, session: SessionState, question: str, run_id: str) -> None:
+        trace_id = new_trace_id()
         ctx = RunContext(
             session_id=session.session_id,
             run_id=run_id,
@@ -222,16 +248,18 @@ class SessionHub:
             mcp_tools=list(session.mcp_tools),
             cfg=session.cfg,
             verifier_client=session.verifier_client,
+            trace_id=trace_id,
         )
         try:
             async for event in self._run_factory(ctx):
-                data = event.model_copy(
-                    update={
-                        "session_id": session.session_id,
-                        "run_id": run_id,
-                        "ts": getattr(event, "ts", None) or datetime.now(tz=UTC),
-                    }
-                )
+                updates: dict[str, Any] = {
+                    "session_id": session.session_id,
+                    "run_id": run_id,
+                    "ts": getattr(event, "ts", None) or datetime.now(tz=UTC),
+                }
+                if not getattr(event, "trace_id", None):
+                    updates["trace_id"] = trace_id
+                data = event.model_copy(update=updates)
                 stored = self.append_event(session, data)
                 if stored.get("type") == "run.failed":
                     break

@@ -32,6 +32,12 @@ class ServerEvent(Envelope):
     ts: datetime
     session_id: str
     run_id: str
+    # Telemetry (7.5) — optional on most events; filled when known. Never CoT.
+    trace_id: str | None = None
+    latency_ms: int | None = None
+    input_tokens: int | None = None
+    output_tokens: int | None = None
+    cost_usd: float | None = None
 
 
 class AgentStarted(ServerEvent):
@@ -105,6 +111,14 @@ class RunFailed(ServerEvent):
     reason: str
 
 
+class RunMetrics(ServerEvent):
+    """End-of-run (or mid-budget) accounting rollup — IDs + tokens/cost/latency only."""
+
+    type: Literal["run.metrics"] = "run.metrics"
+    total_tokens: int = 0
+    turn_count: int = 0
+
+
 class ServerHeartbeat(ServerEvent):
     type: Literal["heartbeat"] = "heartbeat"
     last_event_id: str | None = None
@@ -125,6 +139,7 @@ ServerMessage = Annotated[
     | VerificationGate
     | AnswerFinal
     | RunFailed
+    | RunMetrics
     | ServerHeartbeat,
     Field(discriminator="type"),
 ]
@@ -142,6 +157,7 @@ SERVER_EVENT_TYPES = (
     "verification.gate",
     "answer.final",
     "run.failed",
+    "run.metrics",
 )
 
 

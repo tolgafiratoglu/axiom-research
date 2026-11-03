@@ -14,6 +14,9 @@ tmp/
 .env
 .env.*
 !.env.example
+# Host secrets tree must never enter the build context.
+**/.config/rag/
+**/rag/.env
 *.egg-info/
 dist/
 build/

@@ -70,3 +70,13 @@ def agent_tool_names(agent: object) -> set[str]:
     if names is None:
         return set()
     return set(names)
+
+
+def assert_agent_tools_unchanged(agent: object, expected: set[str]) -> None:
+    """Tool allowlists are code-fixed — hostile source text cannot expand them."""
+    actual = agent_tool_names(agent)
+    if actual != expected:
+        raise RuntimeError(
+            "agent tool permissions changed unexpectedly "
+            f"(got={sorted(actual)}, expected={sorted(expected)})"
+        )

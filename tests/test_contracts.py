@@ -66,6 +66,7 @@ def test_server_event_types_match_readme() -> None:
         "verification.gate",
         "answer.final",
         "run.failed",
+        "run.metrics",
     )
 
 
@@ -129,6 +130,21 @@ def test_server_envelopes_import() -> None:
     )
     assert final.type == "answer.final"
     parse_server({**base, "type": "run.failed", "reason": "verifier unreachable"})
+    metrics = parse_server(
+        {
+            **base,
+            "type": "run.metrics",
+            "trace_id": "tr-1",
+            "latency_ms": 42,
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cost_usd": 0.0001,
+            "turn_count": 1,
+        }
+    )
+    assert metrics.type == "run.metrics"
+    assert metrics.trace_id == "tr-1"
     parse_server({**base, "type": "heartbeat", "last_event_id": "evt-1"})
 
 

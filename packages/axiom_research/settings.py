@@ -1,9 +1,10 @@
 """LLM settings — same secrets file as travel-rag, stricter read path.
 
 ``GEMINI_MODEL`` and ``LLM_PROVIDER`` come from the project ``.env``.
-``GEMINI_API_KEY`` is read only from ``SECRETS_ENV_PATH``
-(``~/.config/rag/.env``). It is not an env-backed Settings field, so a
-project ``.env`` or process ``GEMINI_API_KEY`` is ignored.
+Provider keys (``GEMINI_API_KEY``, ``MP_API_KEY``) are read **only** from
+``SECRETS_ENV_PATH`` (``~/.config/rag/.env`` / Compose mount). They are not
+Settings env fields, so project ``.env`` and process environment values are
+ignored. Keys must never be baked into images.
 
 There is no product auth token for MCP/api/web.
 """
@@ -14,8 +15,17 @@ from typing import Literal
 from dotenv import dotenv_values
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# Must stay off Settings fields and out of Compose ``environment:`` / Dockerfiles.
+PROVIDER_SECRET_NAMES: frozenset[str] = frozenset(
+    {
+        "GEMINI_API_KEY",
+        "MP_API_KEY",
+    }
+)
+
 
 def load_secret(secrets_env_path: str, name: str) -> str:
+    """Read one secret from the secrets file only — never ``os.environ``."""
     path = Path(secrets_env_path).expanduser()
     if not path.is_file():
         return ""
@@ -66,6 +76,10 @@ class Settings(BaseSettings):
     @property
     def gemini_api_key(self) -> str:
         return load_gemini_api_key(self.secrets_env_path)
+
+    @property
+    def mp_api_key(self) -> str:
+        return load_mp_api_key(self.secrets_env_path)
 
 
 def require_gemini(settings: Settings) -> Settings:

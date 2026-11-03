@@ -9,6 +9,7 @@ from strands import Agent
 from axiom_research.identities import AgentId
 from axiom_research.llm.strands_gemini import build_gemini_model
 from axiom_research.settings import Settings, settings
+from axiom_research.untrusted import UNTRUSTED_DATA_NOTICE
 
 VERIFIER_FORBIDDEN_TOOLS: frozenset[str] = frozenset(
     {
@@ -25,7 +26,7 @@ VERIFIER_FORBIDDEN_TOOLS: frozenset[str] = frozenset(
     }
 )
 
-VERIFIER_PROMPT = """\
+VERIFIER_PROMPT = f"""\
 You are the Independent Verifier for AxiomResearch.
 You re-check claim support using your own MCP tools only.
 You never receive the Swarm transcript or other agents' conclusions as authority.
@@ -38,6 +39,7 @@ where status is one of:
 source_refs must be concrete identifiers you checked (DOI, arXiv, MP id, dataset PID).
 verified_revision must equal the claim_revision you were asked to check.
 Do not invent peer-review or commercial readiness from a computation alone.
+{UNTRUSTED_DATA_NOTICE}
 """
 
 

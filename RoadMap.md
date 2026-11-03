@@ -251,12 +251,17 @@ One screen, one socket. Not NASA’s three-column console, not Travel RAG’s an
 
 Production-shaped, still Compose-only.
 
-- [ ] **7.1** Prompt-injection tests: hostile abstract/title cannot change instructions or tool permissions.
-- [ ] **7.2** MCP outage / 429 / timeout → `tool.summary` failure + gate-safe outcome, no fabricated sources.
-- [ ] **7.3** Health: `api` liveness/readiness (Postgres + MCP reachability; Gemini is not a readiness blocker).
-- [ ] **7.4** Provider API keys (e.g. Materials Project) only via secrets mount; not in images. No product auth layer.
-- [ ] **7.5** Run/trace IDs, latency, token cost on events (no private CoT stored).
-- [ ] **7.6** Compose `up` from a clean checkout documented in README (ports, env, Materials Project key).
+- [x] **7.1** Prompt-injection tests: hostile abstract/title cannot change instructions or tool permissions.
+  (`packages/axiom_research/untrusted.py`; `tests/test_prompt_injection.py`.)
+- [x] **7.2** MCP outage / 429 / timeout → `tool.summary` failure + gate-safe outcome, no fabricated sources.
+  (`packages/axiom_research/mcp/failures.py`; normalize fail→`tool.summary`; `tests/test_mcp_failure_paths.py`.)
+- [x] **7.3** Health: `api` liveness/readiness (Postgres + MCP reachability; Gemini is not a readiness blocker).
+  (`api/health.py`; `/health`+`/health/live`+`/health/ready`; `tests/test_api_health.py`.)
+- [x] **7.4** Provider API keys (e.g. Materials Project) only via secrets mount; not in images. No product auth layer.
+  (`PROVIDER_SECRET_NAMES` / secrets-file-only loaders; `tests/test_secrets_policy.py`.)
+- [x] **7.5** Run/trace IDs, latency, token cost on events (no private CoT stored).
+- [x] **7.6** Compose `up` from a clean checkout documented in README (ports, env, Materials Project key).
+  (`ReadMe.md` § Local Compose bring-up; ports / `.env` / `SECRETS_ENV_PATH` + `MP_API_KEY`.)
 
 **Exit:** failure-path tests green; `docker compose up` documented and repeatable.
 
