@@ -55,10 +55,21 @@ class ToolSummary(ServerEvent):
 
 
 class EvidenceUpdated(ServerEvent):
+    """Claim/evidence ledger write — optional fields for inline expand (no raw tool JSON)."""
+
     type: Literal["evidence.updated"] = "evidence.updated"
     evidence_id: str | None = None
     claim_id: str | None = None
     revision: int | None = None
+    statement: str | None = None
+    source_refs: list[str] = Field(default_factory=list)
+    unit: str | None = None
+    value: float | str | None = None
+    method: str | None = None
+    license: str | None = None
+    evidence_kind: str | None = None
+    verification_status: str | None = None
+    retrieved_at: str | None = None
 
 
 class HypothesisCreated(ServerEvent):

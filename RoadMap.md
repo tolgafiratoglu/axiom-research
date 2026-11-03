@@ -8,7 +8,7 @@ This is the **implementation order** of the single target system in [`ReadMe.md`
 - Finish a **subsection** (e.g. 1.B) before opening the next subsection in the same phase.
 - Checkboxes are the source of progress. Mark `[x]` only when the item is in the tree and its tests (if listed) pass.
 - If a change would violate [`ReadMe.md`](./ReadMe.md) boundaries, change the README first — do not “just ship it”.
-- Live provider APIs and Gemini are **not** called from unit tests. Fixtures and mocks only.
+- **No outbound network from tests** (see [`ReadMe.md`](./ReadMe.md) Runtime rule). `tests/` / `pytest` use fixtures and mocks only — never live Gemini, scientific APIs, or live A2A. Live smoke (1.15), Inspector, eval live runner, and `DEMO.md` are **operator-only**, not CI.
 - Agent runs **only** the fixture named on the current item (`pytest` that file, once). Operator runs `docker compose up`, live smoke (1.15), Inspector, eval live runner, and `DEMO.md`.
 - Ports, Swarm budget numbers, npm names, and MCP directory names recorded in **0.A** stay unless the README changes.
 
@@ -208,11 +208,12 @@ This is the release boundary. Swarm must not write the user-facing answer.
 
 ### 5.C Finalizer
 
-- [ ] **5.9** Tool-less agent (or strictly tool-less prompt) reads **policy-approved snapshot only**.
-- [ ] **5.10** Emits `answer.final`: conclusions, citations, disputed/insufficient items labeled, uncertainty. Guardrail: calculation ≠ commercial readiness.
-- [ ] **5.11** Tests: stale-verification regression; rejected claims cannot appear as facts; gate-fail does not produce a fake answer.
+- [x] **5.9** Tool-less agent (or strictly tool-less prompt) reads **policy-approved snapshot only**.
+- [x] **5.10** Emits `answer.final`: conclusions, citations, disputed/insufficient items labeled, uncertainty. Guardrail: calculation ≠ commercial readiness.
+- [x] **5.11** Tests: stale-verification regression; rejected claims cannot appear as facts; gate-fail does not produce a fake answer.
 
 **Exit:** mocked end-to-end `ask` → Swarm → A2A → gate → `answer.final` (or honest failure) over WS.
+(`tests/test_finalizer.py`; WS path with mocked Verifier client.)
 
 ---
 
@@ -222,23 +223,27 @@ One screen, one socket. Not NASA’s three-column console, not Travel RAG’s an
 
 ### 6.A Shell
 
-- [ ] **6.1** App Router page: sticky Final Assessment, scrolling thread, input. Desktop + a usable narrow width.
-- [ ] **6.2** WebSocket client: `ask` / `cancel` / heartbeat / `last_event_id` resume.
-- [ ] **6.3** Assessment panel while running: status, active agent, claim counts — **never a draft answer**.
+- [x] **6.1** App Router page: sticky Final Assessment, scrolling thread, input. Desktop + a usable narrow width.
+- [x] **6.2** WebSocket client: `ask` / `cancel` / heartbeat / `last_event_id` resume.
+- [x] **6.3** Assessment panel while running: status, active agent, claim counts — **never a draft answer**.
+  (`web/`: App Router shell + `SessionSocket`; operator: `npm install` in `web`, copy `.env.local.example`, `npm run dev`.)
 
 ### 6.B Thread
 
-- [ ] **6.4** Render typed events: `handoff`, `tool.summary`, `claim`, `hypothesis`, `a2a.verification`, `verification.gate`, `run.failed`.
-- [ ] **6.5** Local handoff vs A2A visually distinct.
-- [ ] **6.6** Claim expand inline (identifiers, units, license, verification). No second column, no raw CoT, no tool JSON.
-- [ ] **6.7** `answer.final` fills the sticky panel once. Thread gets a one-line “assessment is above” — no duplicate bubble.
+- [x] **6.4** Render typed events: `handoff`, `tool.summary`, `claim`, `hypothesis`, `a2a.verification`, `verification.gate`, `run.failed`.
+- [x] **6.5** Local handoff vs A2A visually distinct.
+- [x] **6.6** Claim expand inline (identifiers, units, license, verification). No second column, no raw CoT, no tool JSON.
+- [x] **6.7** `answer.final` fills the sticky panel once. Thread gets a one-line “assessment is above” — no duplicate bubble.
+  (`web/components/Thread*.tsx`, `ClaimExpand.tsx`; `evidence.updated` display fields in normalize.)
 
 ### 6.C Follow-up
 
-- [ ] **6.8** New `ask` resets sticky panel to in-progress; previous assessment drops into the thread as a collapsed history card.
-- [ ] **6.9** Browser-verify the canonical question layout (sticky + stream + input) before closing the phase.
+- [x] **6.8** New `ask` resets sticky panel to in-progress; previous assessment drops into the thread as a collapsed history card.
+- [x] **6.9** Browser-verify the canonical question layout (sticky + stream + input) before closing the phase.
+  (`AssessmentHistoryCard`; offline `?demo=layout` for sticky + stream + input check.)
 
 **Exit:** UI walkthrough against mocked or local stack shows the seven demo beats from the README.
+(`web/?demo=layout` — no live Gemini/scientific APIs.)
 
 ---
 

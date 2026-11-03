@@ -1,0 +1,93 @@
+:root {
+  --ink: #14201c;
+  --ink-muted: #3d4f47;
+  --paper: #e8efe9;
+  --paper-deep: #d4e0d6;
+  --panel: rgba(248, 251, 249, 0.92);
+  --line: rgba(20, 32, 28, 0.14);
+  --accent: #0f6b5c;
+  --accent-soft: #c5e4dc;
+  --warn: #8a4b12;
+  --fail: #8b2e2e;
+  --a2a: #1a4f7a;
+  /* Expressive stacks without build-time Google Fonts fetch. */
+  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --font-body: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+  --shell-max: 44rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  color: var(--ink);
+  font-family: var(--font-body);
+  background:
+    radial-gradient(1200px 600px at 10% -10%, #cfe8df 0%, transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, #d7e3f0 0%, transparent 50%),
+    linear-gradient(180deg, var(--paper) 0%, var(--paper-deep) 100%);
+}
+
+body {
+  min-height: 100dvh;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+a {
+  color: var(--accent);
+}
+
+/* Thread typed events (6.B) — Swarm local vs remote A2A */
+.evt {
+  padding-left: 0.65rem;
+}
+.evt__tag {
+  display: inline-block;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 650;
+  margin-bottom: 0.15rem;
+}
+.evt p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+.evt--swarm {
+  border-left: 2px solid var(--accent-soft);
+  color: var(--ink-muted);
+}
+.evt--swarm .evt__tag {
+  color: var(--accent);
+}
+.evt--a2a {
+  border-left: 2px solid var(--a2a);
+  color: var(--a2a);
+}
+.evt--a2a .evt__tag {
+  color: var(--a2a);
+}
+.evt--tool {
+  border-left: 2px solid var(--line);
+  color: var(--ink-muted);
+}
+.evt--tool .evt__tag {
+  color: var(--ink-muted);
+}
+.evt--fail {
+  border-left: 2px solid var(--fail);
+  color: var(--fail);
+}
+.evt--fail .evt__tag {
+  color: var(--fail);
+}

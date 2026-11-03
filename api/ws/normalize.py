@@ -46,6 +46,39 @@ def _now() -> datetime:
     return datetime.now(tz=UTC)
 
 
+def _opt_str(body: dict[str, Any], key: str) -> str | None:
+    val = body.get(key)
+    if val is None:
+        return None
+    text = str(val).strip()
+    return text or None
+
+
+def _evidence_display_fields(body: dict[str, Any]) -> dict[str, Any]:
+    """Safe claim/evidence fields for UI expand — never full tool dumps."""
+    refs = body.get("source_refs") or body.get("identifier")
+    source_refs: list[str] = []
+    if isinstance(refs, list):
+        source_refs = [str(r) for r in refs if str(r).strip()]
+    elif isinstance(refs, str) and refs.strip():
+        source_refs = [refs.strip()]
+    retrieved = body.get("retrieved_at")
+    retrieved_at = None
+    if retrieved is not None:
+        retrieved_at = retrieved if isinstance(retrieved, str) else str(retrieved)
+    return {
+        "statement": _opt_str(body, "statement"),
+        "source_refs": source_refs,
+        "unit": _opt_str(body, "unit"),
+        "value": body.get("value"),
+        "method": _opt_str(body, "method"),
+        "license": _opt_str(body, "license"),
+        "evidence_kind": _opt_str(body, "evidence_kind") or _opt_str(body, "kind"),
+        "verification_status": _opt_str(body, "verification_status"),
+        "retrieved_at": retrieved_at,
+    }
+
+
 def _agent_id(node_id: str) -> AgentId | None:
     try:
         return AgentId(node_id)
@@ -182,6 +215,9 @@ def normalize_multiagent_event(
                 elif name in _EVIDENCE_TOOLS:
                     payload = _parse_jsonish(summary) or {}
                     body = payload.get("payload") if isinstance(payload.get("payload"), dict) else payload
+                    if not isinstance(body, dict):
+                        body = {}
+                    display = _evidence_display_fields(body)
                     out.append(
                         EvidenceUpdated(
                             event_id="",
@@ -189,20 +225,19 @@ def normalize_multiagent_event(
                             session_id=session_id,
                             run_id=run_id,
                             evidence_id=(
-                                str(body.get("evidence_id"))
-                                if isinstance(body, dict) and body.get("evidence_id")
+                                str(body["evidence_id"])
+                                if body.get("evidence_id")
                                 else None
                             ),
                             claim_id=(
-                                str(body.get("claim_id"))
-                                if isinstance(body, dict) and body.get("claim_id")
-                                else None
+                                str(body["claim_id"]) if body.get("claim_id") else None
                             ),
                             revision=(
                                 int(body["revision"])
-                                if isinstance(body, dict) and isinstance(body.get("revision"), int)
+                                if isinstance(body.get("revision"), int)
                                 else None
                             ),
+                            **display,
                         )
                     )
                 else:

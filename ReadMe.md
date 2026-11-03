@@ -223,6 +223,7 @@ Illustrative claim (not a scientific assertion):
 - Treat titles, abstracts, dataset descriptions and MCP responses as **untrusted data**; defend against prompt injection and prohibit text retrieved from sources from changing permissions or system instructions.
 - Keep request/run IDs, agent IDs, event ordering, timestamps, cost, token usage, and trace IDs. Store audit trails without exposing private chain-of-thought.
 - `api` remains a session/run gateway. Compose services exist to isolate Verifier, MCP, and storage — not to justify a mesh.
+- **Tests never make outbound network calls.** Anything under `tests/` (and CI `pytest`) uses fixtures, mocks, and in-process fakes only — no live Gemini, no scientific provider APIs (OpenAlex, Crossref, arXiv, Materials Project, PubChem, Zenodo, DataCite, …), no live A2A Verifier, no external HTTP. Optional live checks belong in operator-only scripts (for example `scripts/mcp_live_smoke.py`) or a separately documented demo/eval path — never in the default test suite.
 
 ## Licensing and Research Integrity
 

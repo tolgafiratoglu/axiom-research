@@ -28,6 +28,8 @@ class RunContext:
     models: dict[AgentId, Any] | None = None
     mcp_tools: list[Any] = field(default_factory=list)
     cfg: Settings | None = None
+    # Injected Verifier client (mock in tests; live A2A in operator runs).
+    verifier_client: Any | None = None
 
 
 RunFactory = Callable[[RunContext], AsyncIterator[ServerMessage]]
@@ -99,6 +101,30 @@ async def default_swarm_run_factory(ctx: RunContext) -> AsyncIterator[ServerMess
             run_id=ctx.run_id,
             reason=tracker.exceeded_reason,
         )
+        # Still attempt gate on budget stop when a Verifier client is wired.
+        # (No confident Finalizer if gate fails.)
+
+    if ctx.verifier_client is not None:
+        from api.finalizer import run_finalizer
+        from api.gate import run_verification_gate
+
+        gate = await run_verification_gate(
+            ctx.store,
+            session_id=ctx.session_id,
+            run_id=ctx.run_id,
+            client=ctx.verifier_client,
+        )
+        for event in gate.events:
+            yield event
+            if event.type == "run.failed":
+                return
+        final = run_finalizer(
+            gate,
+            session_id=ctx.session_id,
+            run_id=ctx.run_id,
+        )
+        for event in final.events:
+            yield event
 
 
 @dataclass
@@ -113,6 +139,7 @@ class SessionState:
     models: dict[AgentId, Any] | None = None
     mcp_tools: list[Any] = field(default_factory=list)
     cfg: Settings | None = None
+    verifier_client: Any | None = None
 
     def __post_init__(self) -> None:
         self.events = EventLog(self.session_id)
@@ -194,6 +221,7 @@ class SessionHub:
             models=session.models,
             mcp_tools=list(session.mcp_tools),
             cfg=session.cfg,
+            verifier_client=session.verifier_client,
         )
         try:
             async for event in self._run_factory(ctx):
