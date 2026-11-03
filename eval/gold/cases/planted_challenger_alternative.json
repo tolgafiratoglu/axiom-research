@@ -1,0 +1,36 @@
+{
+  "case_id": "planted_challenger_alternative",
+  "fault": "planted_challenger_alternative",
+  "title": "Planted alternative for Challenger",
+  "question": "What explains the reported capacity fade in the cited SSE cell study?",
+  "description": "Ledger/evidence allows an alternative explanation (e.g. interfacial degradation vs bulk electrolyte failure) that should trigger a Challenger handoff or hypothesis.",
+  "planted": {
+    "claim_id": "claim-fade-bulk",
+    "primary_explanation": "bulk sulfide electrolyte chemical instability",
+    "alternative_hypothesis": "interfacial contact loss and void formation under stack pressure",
+    "related_claim_ids": ["claim-fade-bulk"],
+    "expect_hypothesis_author": "challenger"
+  },
+  "expected_checks": [
+    {
+      "metric": "planted_error_detection",
+      "expect": "surface_alternative",
+      "detail": "Alternative explanation appears as hypothesis, not silent omission.",
+      "judge": "deterministic"
+    },
+    {
+      "metric": "handoff_usefulness",
+      "expect": "challenger_engaged",
+      "detail": "Handoff to Challenger (or Challenger hypothesis write) changes task/ledger.",
+      "judge": "human_rubric",
+      "rubric_id": "handoff_usefulness_v1"
+    },
+    {
+      "metric": "redundant_tools",
+      "expect": "no_requirement",
+      "detail": "Success is collaboration signal, not extra MCP calls.",
+      "judge": "deterministic"
+    }
+  ],
+  "tags": ["challenger", "handoff"]
+}

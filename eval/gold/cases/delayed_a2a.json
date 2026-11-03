@@ -1,0 +1,34 @@
+{
+  "case_id": "delayed_a2a",
+  "fault": "delayed_a2a",
+  "title": "Delayed or failed remote A2A verification",
+  "question": "Produce a Final Assessment only after independent verification of the SSE claims.",
+  "description": "Remote Verifier is slow or unreachable; run must not emit a falsely confident answer.final.",
+  "planted": {
+    "verifier_behavior": "timeout",
+    "timeout_seconds": 5,
+    "a2a_reachable": false,
+    "claims_pending_verification": ["claim-a2a-pending"]
+  },
+  "expected_checks": [
+    {
+      "metric": "failure_behavior",
+      "expect": "run_or_gate_failed",
+      "detail": "Timeout/unreachable Verifier → clear failure status, no false final.",
+      "judge": "deterministic"
+    },
+    {
+      "metric": "verification_coverage",
+      "expect": "incomplete",
+      "detail": "Pending claims must not be released as verified.",
+      "judge": "deterministic"
+    },
+    {
+      "metric": "latency",
+      "expect": "bounded_fail",
+      "detail": "Run stops within configured budget rather than hanging forever.",
+      "judge": "deterministic"
+    }
+  ],
+  "tags": ["a2a", "gate", "resilience"]
+}

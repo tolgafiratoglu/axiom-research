@@ -1,0 +1,30 @@
+{
+  "case_id": "unit_mismatch",
+  "fault": "unit_mismatch",
+  "title": "Incompatible units / conditions",
+  "question": "Do the two reported band gaps for the same SSE composition agree?",
+  "description": "Two numeric results for the same property use incompatible units or measurement conditions without conversion.",
+  "planted": {
+    "claim_id": "claim-unit-mismatch",
+    "property": "band_gap",
+    "result_a": {"value": 3.5, "unit": "eV", "condition": "DFT-PBE, 0 K"},
+    "result_b": {"value": 3500, "unit": "meV", "condition": "experimental optical, 298 K"},
+    "naive_compare_equal": true,
+    "compatible_without_normalization": false
+  },
+  "expected_checks": [
+    {
+      "metric": "claim_to_source",
+      "expect": "fail_or_qualify",
+      "detail": "Must not assert agreement without unit/condition normalization.",
+      "judge": "deterministic"
+    },
+    {
+      "metric": "planted_error_detection",
+      "expect": "detect",
+      "detail": "Unit or condition mismatch flagged (Analyst calc or Challenger).",
+      "judge": "deterministic"
+    }
+  ],
+  "tags": ["units", "data_analyst"]
+}

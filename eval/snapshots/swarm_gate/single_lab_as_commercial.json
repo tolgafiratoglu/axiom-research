@@ -1,0 +1,21 @@
+{
+  "case_id": "single_lab_as_commercial",
+  "mode": "swarm_gate",
+  "event_types": [
+    "hypothesis.created",
+    "agent.handoff",
+    "verification.gate",
+    "answer.final"
+  ],
+  "observations": {
+    "claim_supported": false,
+    "claim_qualified": true,
+    "planted_error_detected": true,
+    "planted_error_kind": "single_lab_as_commercial",
+    "false_final_emitted": false,
+    "notes": "Commercial readiness overclaim disputed; handoff usefulness deferred to human rubric."
+  },
+  "meta": {
+    "source": "authored_fixture"
+  }
+}

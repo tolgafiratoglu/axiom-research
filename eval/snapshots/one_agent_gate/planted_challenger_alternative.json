@@ -1,0 +1,21 @@
+{
+  "case_id": "planted_challenger_alternative",
+  "mode": "one_agent_gate",
+  "event_types": [
+    "hypothesis.created",
+    "verification.gate"
+  ],
+  "observations": {
+    "planted_error_detected": false,
+    "planted_error_kind": null,
+    "redundant_tools_excess": false,
+    "false_final_emitted": true,
+    "notes": "one_agent_gate: A2A gate on; no Swarm Challenger (planted_challenger_alternative).",
+    "claim_supported": true,
+    "claim_qualified": false
+  },
+  "meta": {
+    "source": "authored_fixture",
+    "comparison_arm": "one_agent_gate"
+  }
+}

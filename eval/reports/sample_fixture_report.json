@@ -1,0 +1,1060 @@
+{
+  "title": "AxiomResearch fixture evaluation report",
+  "source": "fixtures",
+  "generated_at": "2026-11-03T00:00:00+00:00",
+  "budgets": {
+    "max_handoffs": 8,
+    "max_iterations": 8,
+    "execution_timeout_seconds": 180.0,
+    "node_timeout_seconds": 45.0,
+    "max_tokens_per_run": 100000,
+    "max_cost_usd_per_run": 1.0,
+    "mcp_servers": [
+      "mcp-literature",
+      "mcp-materials",
+      "mcp-research-data"
+    ]
+  },
+  "budgets_identical": true,
+  "mode_labels": {
+    "one_agent_no_gate": "one agent + same MCP, no gate",
+    "one_agent_gate": "one agent + same MCP + A2A gate",
+    "swarm_gate": "Swarm + A2A gate"
+  },
+  "mode_suite_passed": {
+    "one_agent_no_gate": false,
+    "one_agent_gate": false,
+    "swarm_gate": true
+  },
+  "metrics": [
+    {
+      "metric": "citation_validity",
+      "by_mode": {
+        "one_agent_no_gate": {
+          "pass_count": 2,
+          "fail_count": 1,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 6
+        },
+        "one_agent_gate": {
+          "pass_count": 3,
+          "fail_count": 0,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 6
+        },
+        "swarm_gate": {
+          "pass_count": 3,
+          "fail_count": 0,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 6
+        }
+      },
+      "notes": null
+    },
+    {
+      "metric": "claim_to_source",
+      "by_mode": {
+        "one_agent_no_gate": {
+          "pass_count": 0,
+          "fail_count": 5,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 4
+        },
+        "one_agent_gate": {
+          "pass_count": 3,
+          "fail_count": 2,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 4
+        },
+        "swarm_gate": {
+          "pass_count": 5,
+          "fail_count": 0,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 4
+        }
+      },
+      "notes": null
+    },
+    {
+      "metric": "planted_error_detection",
+      "by_mode": {
+        "one_agent_no_gate": {
+          "pass_count": 1,
+          "fail_count": 7,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 1
+        },
+        "one_agent_gate": {
+          "pass_count": 5,
+          "fail_count": 3,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 1
+        },
+        "swarm_gate": {
+          "pass_count": 8,
+          "fail_count": 0,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 1
+        }
+      },
+      "notes": null
+    },
+    {
+      "metric": "verification_coverage",
+      "by_mode": {
+        "one_agent_no_gate": {
+          "pass_count": 0,
+          "fail_count": 3,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 6
+        },
+        "one_agent_gate": {
+          "pass_count": 3,
+          "fail_count": 0,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 6
+        },
+        "swarm_gate": {
+          "pass_count": 3,
+          "fail_count": 0,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 6
+        }
+      },
+      "notes": null
+    },
+    {
+      "metric": "handoff_usefulness",
+      "by_mode": {
+        "one_agent_no_gate": {
+          "pass_count": 0,
+          "fail_count": 0,
+          "pending_human": 2,
+          "skip_count": 0,
+          "absent_count": 7
+        },
+        "one_agent_gate": {
+          "pass_count": 0,
+          "fail_count": 0,
+          "pending_human": 2,
+          "skip_count": 0,
+          "absent_count": 7
+        },
+        "swarm_gate": {
+          "pass_count": 0,
+          "fail_count": 0,
+          "pending_human": 2,
+          "skip_count": 0,
+          "absent_count": 7
+        }
+      },
+      "notes": "Qualitative — human rubric only; never LLM-as-judge."
+    },
+    {
+      "metric": "redundant_tools",
+      "by_mode": {
+        "one_agent_no_gate": {
+          "pass_count": 1,
+          "fail_count": 0,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 8
+        },
+        "one_agent_gate": {
+          "pass_count": 1,
+          "fail_count": 0,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 8
+        },
+        "swarm_gate": {
+          "pass_count": 1,
+          "fail_count": 0,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 8
+        }
+      },
+      "notes": null
+    },
+    {
+      "metric": "latency",
+      "by_mode": {
+        "one_agent_no_gate": {
+          "pass_count": 0,
+          "fail_count": 1,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 8
+        },
+        "one_agent_gate": {
+          "pass_count": 1,
+          "fail_count": 0,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 8
+        },
+        "swarm_gate": {
+          "pass_count": 1,
+          "fail_count": 0,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 8
+        }
+      },
+      "notes": "Scored where gold expects bounded failure (e.g. delayed_a2a)."
+    },
+    {
+      "metric": "token_cost",
+      "by_mode": {
+        "one_agent_no_gate": {
+          "pass_count": 0,
+          "fail_count": 0,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 9
+        },
+        "one_agent_gate": {
+          "pass_count": 0,
+          "fail_count": 0,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 9
+        },
+        "swarm_gate": {
+          "pass_count": 0,
+          "fail_count": 0,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 9
+        }
+      },
+      "notes": "Declared in the metric set; gold cases may omit checks until live runs record accounting (fixture cells show absent)."
+    },
+    {
+      "metric": "failure_behavior",
+      "by_mode": {
+        "one_agent_no_gate": {
+          "pass_count": 1,
+          "fail_count": 2,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 6
+        },
+        "one_agent_gate": {
+          "pass_count": 3,
+          "fail_count": 0,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 6
+        },
+        "swarm_gate": {
+          "pass_count": 3,
+          "fail_count": 0,
+          "pending_human": 0,
+          "skip_count": 0,
+          "absent_count": 6
+        }
+      },
+      "notes": null
+    }
+  ],
+  "case_metric_matrix": [
+    {
+      "case_id": "fabricated_doi",
+      "metric": "citation_validity",
+      "by_mode": {
+        "one_agent_no_gate": "fail",
+        "one_agent_gate": "pass",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "fabricated_doi",
+      "metric": "claim_to_source",
+      "by_mode": {
+        "one_agent_no_gate": "fail",
+        "one_agent_gate": "pass",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "fabricated_doi",
+      "metric": "planted_error_detection",
+      "by_mode": {
+        "one_agent_no_gate": "fail",
+        "one_agent_gate": "pass",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "fabricated_doi",
+      "metric": "verification_coverage",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "fabricated_doi",
+      "metric": "handoff_usefulness",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "fabricated_doi",
+      "metric": "redundant_tools",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "fabricated_doi",
+      "metric": "latency",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "fabricated_doi",
+      "metric": "token_cost",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "fabricated_doi",
+      "metric": "failure_behavior",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "preprint_as_peer_review",
+      "metric": "citation_validity",
+      "by_mode": {
+        "one_agent_no_gate": "pass",
+        "one_agent_gate": "pass",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "preprint_as_peer_review",
+      "metric": "claim_to_source",
+      "by_mode": {
+        "one_agent_no_gate": "fail",
+        "one_agent_gate": "pass",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "preprint_as_peer_review",
+      "metric": "planted_error_detection",
+      "by_mode": {
+        "one_agent_no_gate": "fail",
+        "one_agent_gate": "pass",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "preprint_as_peer_review",
+      "metric": "verification_coverage",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "preprint_as_peer_review",
+      "metric": "handoff_usefulness",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "preprint_as_peer_review",
+      "metric": "redundant_tools",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "preprint_as_peer_review",
+      "metric": "latency",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "preprint_as_peer_review",
+      "metric": "token_cost",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "preprint_as_peer_review",
+      "metric": "failure_behavior",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "unit_mismatch",
+      "metric": "citation_validity",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "unit_mismatch",
+      "metric": "claim_to_source",
+      "by_mode": {
+        "one_agent_no_gate": "fail",
+        "one_agent_gate": "fail",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "unit_mismatch",
+      "metric": "planted_error_detection",
+      "by_mode": {
+        "one_agent_no_gate": "fail",
+        "one_agent_gate": "fail",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "unit_mismatch",
+      "metric": "verification_coverage",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "unit_mismatch",
+      "metric": "handoff_usefulness",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "unit_mismatch",
+      "metric": "redundant_tools",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "unit_mismatch",
+      "metric": "latency",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "unit_mismatch",
+      "metric": "token_cost",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "unit_mismatch",
+      "metric": "failure_behavior",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "computed_as_experimental",
+      "metric": "citation_validity",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "computed_as_experimental",
+      "metric": "claim_to_source",
+      "by_mode": {
+        "one_agent_no_gate": "fail",
+        "one_agent_gate": "pass",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "computed_as_experimental",
+      "metric": "planted_error_detection",
+      "by_mode": {
+        "one_agent_no_gate": "fail",
+        "one_agent_gate": "pass",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "computed_as_experimental",
+      "metric": "verification_coverage",
+      "by_mode": {
+        "one_agent_no_gate": "fail",
+        "one_agent_gate": "pass",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "computed_as_experimental",
+      "metric": "handoff_usefulness",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "computed_as_experimental",
+      "metric": "redundant_tools",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "computed_as_experimental",
+      "metric": "latency",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "computed_as_experimental",
+      "metric": "token_cost",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "computed_as_experimental",
+      "metric": "failure_behavior",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "single_lab_as_commercial",
+      "metric": "citation_validity",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "single_lab_as_commercial",
+      "metric": "claim_to_source",
+      "by_mode": {
+        "one_agent_no_gate": "fail",
+        "one_agent_gate": "fail",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "single_lab_as_commercial",
+      "metric": "planted_error_detection",
+      "by_mode": {
+        "one_agent_no_gate": "fail",
+        "one_agent_gate": "fail",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "single_lab_as_commercial",
+      "metric": "verification_coverage",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "single_lab_as_commercial",
+      "metric": "handoff_usefulness",
+      "by_mode": {
+        "one_agent_no_gate": "pending_human",
+        "one_agent_gate": "pending_human",
+        "swarm_gate": "pending_human"
+      }
+    },
+    {
+      "case_id": "single_lab_as_commercial",
+      "metric": "redundant_tools",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "single_lab_as_commercial",
+      "metric": "latency",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "single_lab_as_commercial",
+      "metric": "token_cost",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "single_lab_as_commercial",
+      "metric": "failure_behavior",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "planted_challenger_alternative",
+      "metric": "citation_validity",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "planted_challenger_alternative",
+      "metric": "claim_to_source",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "planted_challenger_alternative",
+      "metric": "planted_error_detection",
+      "by_mode": {
+        "one_agent_no_gate": "fail",
+        "one_agent_gate": "fail",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "planted_challenger_alternative",
+      "metric": "verification_coverage",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "planted_challenger_alternative",
+      "metric": "handoff_usefulness",
+      "by_mode": {
+        "one_agent_no_gate": "pending_human",
+        "one_agent_gate": "pending_human",
+        "swarm_gate": "pending_human"
+      }
+    },
+    {
+      "case_id": "planted_challenger_alternative",
+      "metric": "redundant_tools",
+      "by_mode": {
+        "one_agent_no_gate": "pass",
+        "one_agent_gate": "pass",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "planted_challenger_alternative",
+      "metric": "latency",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "planted_challenger_alternative",
+      "metric": "token_cost",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "planted_challenger_alternative",
+      "metric": "failure_behavior",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "stale_verification",
+      "metric": "citation_validity",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "stale_verification",
+      "metric": "claim_to_source",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "stale_verification",
+      "metric": "planted_error_detection",
+      "by_mode": {
+        "one_agent_no_gate": "fail",
+        "one_agent_gate": "pass",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "stale_verification",
+      "metric": "verification_coverage",
+      "by_mode": {
+        "one_agent_no_gate": "fail",
+        "one_agent_gate": "pass",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "stale_verification",
+      "metric": "handoff_usefulness",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "stale_verification",
+      "metric": "redundant_tools",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "stale_verification",
+      "metric": "latency",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "stale_verification",
+      "metric": "token_cost",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "stale_verification",
+      "metric": "failure_behavior",
+      "by_mode": {
+        "one_agent_no_gate": "fail",
+        "one_agent_gate": "pass",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "mcp_outage",
+      "metric": "citation_validity",
+      "by_mode": {
+        "one_agent_no_gate": "pass",
+        "one_agent_gate": "pass",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "mcp_outage",
+      "metric": "claim_to_source",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "mcp_outage",
+      "metric": "planted_error_detection",
+      "by_mode": {
+        "one_agent_no_gate": "pass",
+        "one_agent_gate": "pass",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "mcp_outage",
+      "metric": "verification_coverage",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "mcp_outage",
+      "metric": "handoff_usefulness",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "mcp_outage",
+      "metric": "redundant_tools",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "mcp_outage",
+      "metric": "latency",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "mcp_outage",
+      "metric": "token_cost",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "mcp_outage",
+      "metric": "failure_behavior",
+      "by_mode": {
+        "one_agent_no_gate": "pass",
+        "one_agent_gate": "pass",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "delayed_a2a",
+      "metric": "citation_validity",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "delayed_a2a",
+      "metric": "claim_to_source",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "delayed_a2a",
+      "metric": "planted_error_detection",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "delayed_a2a",
+      "metric": "verification_coverage",
+      "by_mode": {
+        "one_agent_no_gate": "fail",
+        "one_agent_gate": "pass",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "delayed_a2a",
+      "metric": "handoff_usefulness",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "delayed_a2a",
+      "metric": "redundant_tools",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "delayed_a2a",
+      "metric": "latency",
+      "by_mode": {
+        "one_agent_no_gate": "fail",
+        "one_agent_gate": "pass",
+        "swarm_gate": "pass"
+      }
+    },
+    {
+      "case_id": "delayed_a2a",
+      "metric": "token_cost",
+      "by_mode": {
+        "one_agent_no_gate": "absent",
+        "one_agent_gate": "absent",
+        "swarm_gate": "absent"
+      }
+    },
+    {
+      "case_id": "delayed_a2a",
+      "metric": "failure_behavior",
+      "by_mode": {
+        "one_agent_no_gate": "fail",
+        "one_agent_gate": "pass",
+        "swarm_gate": "pass"
+      }
+    }
+  ],
+  "gate_credits": [
+    {
+      "case_id": "fabricated_doi",
+      "metric": "citation_validity",
+      "weaker_mode": "one_agent_no_gate",
+      "stronger_mode": "one_agent_gate",
+      "detail": "A2A/gate improvement — do not attribute to Swarm"
+    },
+    {
+      "case_id": "fabricated_doi",
+      "metric": "planted_error_detection",
+      "weaker_mode": "one_agent_no_gate",
+      "stronger_mode": "one_agent_gate",
+      "detail": "A2A/gate improvement — do not attribute to Swarm"
+    },
+    {
+      "case_id": "stale_verification",
+      "metric": "verification_coverage",
+      "weaker_mode": "one_agent_no_gate",
+      "stronger_mode": "one_agent_gate",
+      "detail": "A2A/gate improvement — do not attribute to Swarm"
+    },
+    {
+      "case_id": "stale_verification",
+      "metric": "failure_behavior",
+      "weaker_mode": "one_agent_no_gate",
+      "stronger_mode": "one_agent_gate",
+      "detail": "A2A/gate improvement — do not attribute to Swarm"
+    },
+    {
+      "case_id": "computed_as_experimental",
+      "metric": "verification_coverage",
+      "weaker_mode": "one_agent_no_gate",
+      "stronger_mode": "one_agent_gate",
+      "detail": "A2A/gate improvement — do not attribute to Swarm"
+    }
+  ],
+  "swarm_credits": [
+    {
+      "case_id": "planted_challenger_alternative",
+      "metric": "planted_error_detection",
+      "weaker_mode": "one_agent_gate",
+      "stronger_mode": "swarm_gate",
+      "detail": "Swarm/Challenger collaboration — not Verifier credit"
+    },
+    {
+      "case_id": "single_lab_as_commercial",
+      "metric": "planted_error_detection",
+      "weaker_mode": "one_agent_gate",
+      "stronger_mode": "swarm_gate",
+      "detail": "Swarm/Challenger collaboration — not Verifier credit"
+    }
+  ],
+  "summary": "Fixture three-way report: swarm_gate passed=True; gate_credits=5; swarm_credits=2. Do not credit Swarm for Verifier gains (see gate_credits).",
+  "llm_as_judge": false
+}

@@ -1,0 +1,20 @@
+{
+  "case_id": "stale_verification",
+  "mode": "swarm_gate",
+  "event_types": [
+    "a2a.verification",
+    "verification.gate",
+    "run.failed"
+  ],
+  "observations": {
+    "planted_error_detected": true,
+    "planted_error_kind": "stale_verification",
+    "verification_outcome": "stale_reject",
+    "failure_outcome": "no_false_final",
+    "false_final_emitted": false,
+    "notes": "Prior verify bound to rev1; current claim rev2 \u2014 gate rejects release."
+  },
+  "meta": {
+    "source": "authored_fixture"
+  }
+}

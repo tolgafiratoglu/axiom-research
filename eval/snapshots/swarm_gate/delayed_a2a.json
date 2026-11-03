@@ -1,0 +1,19 @@
+{
+  "case_id": "delayed_a2a",
+  "mode": "swarm_gate",
+  "event_types": [
+    "verification.gate",
+    "run.failed"
+  ],
+  "observations": {
+    "failure_outcome": "run_or_gate_failed",
+    "verification_outcome": "incomplete",
+    "latency_bounded": true,
+    "latency_ms": 5000,
+    "false_final_emitted": false,
+    "notes": "Verifier timeout within budget; no answer.final."
+  },
+  "meta": {
+    "source": "authored_fixture"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "case_id": "computed_as_experimental",
+  "mode": "one_agent_gate",
+  "event_types": [
+    "evidence.updated",
+    "a2a.verification",
+    "verification.gate"
+  ],
+  "observations": {
+    "claim_supported": false,
+    "claim_qualified": true,
+    "planted_error_detected": true,
+    "planted_error_kind": "computed_as_experimental",
+    "verification_outcome": "reject_or_insufficient",
+    "false_final_emitted": false,
+    "notes": "one_agent_gate: Verifier/gate catches computed_as_experimental; not Swarm credit."
+  },
+  "meta": {
+    "source": "authored_fixture",
+    "comparison_arm": "one_agent_gate"
+  }
+}

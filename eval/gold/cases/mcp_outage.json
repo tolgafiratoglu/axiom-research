@@ -1,0 +1,35 @@
+{
+  "case_id": "mcp_outage",
+  "fault": "mcp_outage",
+  "title": "MCP outage / 429 / timeout",
+  "question": "Retrieve Materials Project records for LiFePO4-related solid electrolytes.",
+  "description": "Upstream MCP/provider returns 429 or times out; UI gets tool.summary failure; no fabricated sources enter the ledger.",
+  "planted": {
+    "mcp_server": "mcp-materials",
+    "tool_name": "materials_project_search_formula",
+    "upstream_status": 429,
+    "error_class": "rate_limited",
+    "fabricated_source_forbidden": "materials-project:mp-fabricated-outage"
+  },
+  "expected_checks": [
+    {
+      "metric": "failure_behavior",
+      "expect": "tool_summary_failure",
+      "detail": "Failure surfaces as tool.summary ok=false; gate-safe.",
+      "judge": "deterministic"
+    },
+    {
+      "metric": "citation_validity",
+      "expect": "no_fabricated_sources",
+      "detail": "Outage must not invent source/DOI rows.",
+      "judge": "deterministic"
+    },
+    {
+      "metric": "planted_error_detection",
+      "expect": "n/a_outage",
+      "detail": "Primary signal is graceful failure, not scientific error plant.",
+      "judge": "deterministic"
+    }
+  ],
+  "tags": ["mcp", "resilience"]
+}

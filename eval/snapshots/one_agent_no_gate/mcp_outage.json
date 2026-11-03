@@ -1,0 +1,25 @@
+{
+  "case_id": "mcp_outage",
+  "mode": "one_agent_no_gate",
+  "event_types": [
+    "tool.summary"
+  ],
+  "observations": {
+    "failure_outcome": "tool_summary_failure",
+    "false_final_emitted": false,
+    "fabricated_sources_present": false,
+    "planted_error_detected": null,
+    "notes": "one_agent_no_gate: no A2A gate; may over-claim (mcp_outage).",
+    "citation_valid": null,
+    "claim_supported": null,
+    "claim_qualified": false,
+    "planted_error_kind": null,
+    "verification_outcome": null,
+    "latency_bounded": null,
+    "redundant_tools_excess": false
+  },
+  "meta": {
+    "source": "authored_fixture",
+    "comparison_arm": "one_agent_no_gate"
+  }
+}

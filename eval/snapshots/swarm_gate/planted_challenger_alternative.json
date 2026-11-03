@@ -1,0 +1,19 @@
+{
+  "case_id": "planted_challenger_alternative",
+  "mode": "swarm_gate",
+  "event_types": [
+    "agent.handoff",
+    "hypothesis.created",
+    "verification.gate"
+  ],
+  "observations": {
+    "planted_error_detected": true,
+    "planted_error_kind": "planted_challenger_alternative",
+    "redundant_tools_excess": false,
+    "false_final_emitted": false,
+    "notes": "Alternative hypothesis written by Challenger; handoff scored by human rubric."
+  },
+  "meta": {
+    "source": "authored_fixture"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "case_id": "preprint_as_peer_review",
+  "mode": "one_agent_no_gate",
+  "event_types": [
+    "tool.summary",
+    "answer.final"
+  ],
+  "observations": {
+    "citation_valid": false,
+    "claim_supported": true,
+    "claim_qualified": false,
+    "planted_error_detected": false,
+    "planted_error_kind": null,
+    "verification_outcome": null,
+    "false_final_emitted": true,
+    "notes": "one_agent_no_gate: no A2A gate; may over-claim (preprint_as_peer_review).",
+    "failure_outcome": null,
+    "fabricated_sources_present": false,
+    "latency_bounded": null,
+    "redundant_tools_excess": false
+  },
+  "meta": {
+    "source": "authored_fixture",
+    "comparison_arm": "one_agent_no_gate"
+  }
+}

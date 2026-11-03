@@ -1,0 +1,18 @@
+{
+  "case_id": "mcp_outage",
+  "mode": "swarm_gate",
+  "event_types": [
+    "tool.summary",
+    "verification.gate"
+  ],
+  "observations": {
+    "failure_outcome": "tool_summary_failure",
+    "false_final_emitted": false,
+    "fabricated_sources_present": false,
+    "planted_error_detected": null,
+    "notes": "429/timeout \u2192 tool.summary ok=false; no fabricated MP ids."
+  },
+  "meta": {
+    "source": "authored_fixture"
+  }
+}

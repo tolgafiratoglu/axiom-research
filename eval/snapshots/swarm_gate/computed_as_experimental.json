@@ -1,0 +1,21 @@
+{
+  "case_id": "computed_as_experimental",
+  "mode": "swarm_gate",
+  "event_types": [
+    "evidence.updated",
+    "a2a.verification",
+    "verification.gate"
+  ],
+  "observations": {
+    "claim_supported": false,
+    "claim_qualified": true,
+    "planted_error_detected": true,
+    "planted_error_kind": "computed_as_experimental",
+    "verification_outcome": "reject_or_insufficient",
+    "false_final_emitted": false,
+    "notes": "Materials Project computed_property not upgraded to measurement."
+  },
+  "meta": {
+    "source": "authored_fixture"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "case_id": "computed_as_experimental",
+  "fault": "computed_as_experimental",
+  "title": "Computed property as experimental",
+  "question": "Is the cited Li-ion conductivity an experimentally measured value?",
+  "description": "Materials Project computed_property is stated as experimentally established measurement.",
+  "planted": {
+    "claim_id": "claim-computed-as-exp",
+    "claim_statement": "Experimentally measured ionic conductivity confirms room-temperature SSE performance.",
+    "source_refs": ["materials-project:mp-149"],
+    "true_evidence_kind": "computed_property",
+    "claimed_evidence_kind": "measurement",
+    "method": "DFT / Materials Project summary"
+  },
+  "expected_checks": [
+    {
+      "metric": "claim_to_source",
+      "expect": "fail_or_qualify",
+      "detail": "Computed ≠ experimental; status must stay labeled.",
+      "judge": "deterministic"
+    },
+    {
+      "metric": "planted_error_detection",
+      "expect": "detect",
+      "detail": "evidence_kind conflation detected.",
+      "judge": "deterministic"
+    },
+    {
+      "metric": "verification_coverage",
+      "expect": "reject_or_insufficient",
+      "detail": "Verifier/gate must not upgrade computed to measurement.",
+      "judge": "deterministic"
+    }
+  ],
+  "tags": ["materials", "evidence_kind"]
+}

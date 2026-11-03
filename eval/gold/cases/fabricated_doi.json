@@ -1,0 +1,39 @@
+{
+  "case_id": "fabricated_doi",
+  "fault": "fabricated_doi",
+  "title": "Fabricated / wrong DOI",
+  "question": "What peer-reviewed evidence supports sulfide solid electrolytes for EV-scale solid-state batteries?",
+  "description": "A claim cites DOI 10.9999/axiom.fabricated-doi-001 which must not resolve to a supporting paper (fabricated or maps to an unrelated work).",
+  "planted": {
+    "claim_id": "claim-fab-doi",
+    "claim_statement": "Peer-reviewed studies confirm commercial readiness of sulfide SSEs.",
+    "source_refs": ["doi:10.9999/axiom.fabricated-doi-001"],
+    "evidence_kind": "peer_reviewed",
+    "doi_resolution": {
+      "doi": "10.9999/axiom.fabricated-doi-001",
+      "resolves": false,
+      "fixture_status": 404
+    }
+  },
+  "expected_checks": [
+    {
+      "metric": "citation_validity",
+      "expect": "reject",
+      "detail": "DOI must not count as a valid supporting citation.",
+      "judge": "deterministic"
+    },
+    {
+      "metric": "claim_to_source",
+      "expect": "fail",
+      "detail": "Claim must not be treated as source-supported.",
+      "judge": "deterministic"
+    },
+    {
+      "metric": "planted_error_detection",
+      "expect": "detect",
+      "detail": "Fabricated DOI flagged before Final Assessment.",
+      "judge": "deterministic"
+    }
+  ],
+  "tags": ["literature", "citation"]
+}

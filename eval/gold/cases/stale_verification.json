@@ -1,0 +1,36 @@
+{
+  "case_id": "stale_verification",
+  "fault": "stale_verification",
+  "title": "Stale verification after claim edit",
+  "question": "After updating the band-gap claim, may the prior verified verdict still authorize Finalizer release?",
+  "description": "Claim revision increments after a verification record; gate must treat prior verification as stale.",
+  "planted": {
+    "claim_id": "claim-stale",
+    "verified_revision": 1,
+    "current_revision": 2,
+    "verification_status_at_verify": "verified",
+    "verification_fingerprint_at_verify": "fp-claim-rev1",
+    "current_fingerprint": "fp-claim-rev2"
+  },
+  "expected_checks": [
+    {
+      "metric": "verification_coverage",
+      "expect": "stale_reject",
+      "detail": "Gate rejects release on stale verification fingerprint/revision.",
+      "judge": "deterministic"
+    },
+    {
+      "metric": "planted_error_detection",
+      "expect": "detect",
+      "detail": "Stale verification must not be treated as current fact.",
+      "judge": "deterministic"
+    },
+    {
+      "metric": "failure_behavior",
+      "expect": "no_false_final",
+      "detail": "No falsely confident answer.final from stale verify.",
+      "judge": "deterministic"
+    }
+  ],
+  "tags": ["gate", "revision"]
+}

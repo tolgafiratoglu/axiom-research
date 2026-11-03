@@ -1,0 +1,24 @@
+{
+  "case_id": "preprint_as_peer_review",
+  "mode": "one_agent_gate",
+  "event_types": [
+    "evidence.updated",
+    "hypothesis.created",
+    "verification.gate",
+    "answer.final"
+  ],
+  "observations": {
+    "citation_valid": false,
+    "claim_supported": false,
+    "claim_qualified": true,
+    "planted_error_detected": true,
+    "planted_error_kind": "preprint_as_peer_review",
+    "verification_outcome": "reject_or_insufficient",
+    "false_final_emitted": false,
+    "notes": "one_agent_gate: Verifier/gate catches preprint_as_peer_review; not Swarm credit."
+  },
+  "meta": {
+    "source": "authored_fixture",
+    "comparison_arm": "one_agent_gate"
+  }
+}

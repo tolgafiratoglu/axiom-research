@@ -35,3 +35,5 @@ tmp/
 
 eval/results/
 eval/live/
+# Regenerated locally; checked-in sample is sample_fixture_report.*
+eval/reports/*_latest.json

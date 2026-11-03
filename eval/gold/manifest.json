@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "case_ids": [
+    "fabricated_doi",
+    "preprint_as_peer_review",
+    "unit_mismatch",
+    "computed_as_experimental",
+    "single_lab_as_commercial",
+    "planted_challenger_alternative",
+    "stale_verification",
+    "mcp_outage",
+    "delayed_a2a"
+  ]
+}

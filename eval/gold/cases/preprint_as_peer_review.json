@@ -1,0 +1,37 @@
+{
+  "case_id": "preprint_as_peer_review",
+  "fault": "preprint_as_peer_review",
+  "title": "Preprint described as peer-reviewed",
+  "question": "Is the cited solid-state battery stability result from a peer-reviewed journal article?",
+  "description": "arXiv-only preprint is written into the ledger (or claim text) as peer_reviewed.",
+  "planted": {
+    "claim_id": "claim-preprint-mislabel",
+    "claim_statement": "A peer-reviewed journal article establishes long-cycle SSE stability.",
+    "source_refs": ["arxiv:2102.00002"],
+    "true_evidence_kind": "preprint",
+    "claimed_evidence_kind": "peer_reviewed",
+    "is_preprint": true,
+    "has_journal_version": false
+  },
+  "expected_checks": [
+    {
+      "metric": "citation_validity",
+      "expect": "flag_status",
+      "detail": "Preprint must remain labeled preprint, not peer_reviewed.",
+      "judge": "deterministic"
+    },
+    {
+      "metric": "planted_error_detection",
+      "expect": "detect",
+      "detail": "Mislabel preprint→peer_reviewed must be caught.",
+      "judge": "deterministic"
+    },
+    {
+      "metric": "claim_to_source",
+      "expect": "fail_or_qualify",
+      "detail": "Final text must not state peer-reviewed status for arXiv-only work.",
+      "judge": "deterministic"
+    }
+  ],
+  "tags": ["literature", "evidence_kind"]
+}

@@ -1,0 +1,36 @@
+{
+  "case_id": "single_lab_as_commercial",
+  "fault": "single_lab_as_commercial",
+  "title": "Single lab result as commercial readiness",
+  "question": "Do published lab results show solid-state cells are ready to replace Li-ion at commercial scale?",
+  "description": "One laboratory measurement is used to claim commercial-scale readiness, cost competitiveness, or market adoption.",
+  "planted": {
+    "claim_id": "claim-lab-as-commercial",
+    "claim_statement": "A single coin-cell experiment proves solid-state batteries are commercially ready to replace Li-ion.",
+    "evidence_kind": "measurement",
+    "scale": "coin_cell_lab",
+    "overclaim": "commercial_readiness"
+  },
+  "expected_checks": [
+    {
+      "metric": "planted_error_detection",
+      "expect": "detect",
+      "detail": "Lab ≠ commercial readiness overclaim flagged.",
+      "judge": "deterministic"
+    },
+    {
+      "metric": "claim_to_source",
+      "expect": "fail_or_qualify",
+      "detail": "Final Assessment must not state commercial readiness as established fact.",
+      "judge": "deterministic"
+    },
+    {
+      "metric": "handoff_usefulness",
+      "expect": "challenger_or_limitation",
+      "detail": "Challenger/limitation path should surface scale gap.",
+      "judge": "human_rubric",
+      "rubric_id": "handoff_usefulness_v1"
+    }
+  ],
+  "tags": ["overclaim", "guardrail"]
+}

@@ -1,0 +1,20 @@
+{
+  "case_id": "unit_mismatch",
+  "mode": "swarm_gate",
+  "event_types": [
+    "tool.summary",
+    "hypothesis.created",
+    "verification.gate"
+  ],
+  "observations": {
+    "claim_supported": false,
+    "claim_qualified": true,
+    "planted_error_detected": true,
+    "planted_error_kind": "unit_mismatch",
+    "false_final_emitted": false,
+    "notes": "eV vs meV / condition mismatch flagged; no agreement asserted."
+  },
+  "meta": {
+    "source": "authored_fixture"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "case_id": "fabricated_doi",
+  "mode": "swarm_gate",
+  "event_types": [
+    "tool.summary",
+    "evidence.updated",
+    "a2a.verification",
+    "verification.gate"
+  ],
+  "observations": {
+    "citation_valid": false,
+    "claim_supported": false,
+    "planted_error_detected": true,
+    "planted_error_kind": "fabricated_doi",
+    "verification_outcome": "reject_or_insufficient",
+    "failure_outcome": null,
+    "false_final_emitted": false,
+    "fabricated_sources_present": false,
+    "notes": "DOI 10.9999/axiom.fabricated-doi-001 does not resolve; claim not established."
+  },
+  "meta": {
+    "source": "authored_fixture"
+  }
+}

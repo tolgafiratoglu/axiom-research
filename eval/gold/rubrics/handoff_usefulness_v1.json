@@ -1,0 +1,30 @@
+{
+  "rubric_id": "handoff_usefulness_v1",
+  "metric": "handoff_usefulness",
+  "version": 1,
+  "title": "Handoff usefulness (human-reviewed)",
+  "ground_truth": "human",
+  "scale": ["fail", "partial", "pass"],
+  "criteria": [
+    {
+      "id": "changes_task_or_ledger",
+      "weight": 2,
+      "required": true,
+      "pass_when": "The handoff or Challenger action changes the next agent task or writes to the ledger (hypothesis, claim limitation, or explicit follow-up). A no-op hop that only restates the prior agent does not pass."
+    },
+    {
+      "id": "alternative_or_gap_visible",
+      "weight": 2,
+      "required": true,
+      "pass_when": "The planted alternative explanation or scale/methodology gap is visible in the thread or ledger as a hypothesis or labeled limitation — not only in private chain-of-thought."
+    },
+    {
+      "id": "not_supervisor_churn",
+      "weight": 1,
+      "required": true,
+      "pass_when": "Collaboration is not scored as useful merely because multiple agents spoke; there is a concrete dependency (missing data request, contradiction, or reframed question)."
+    }
+  ],
+  "aggregate": "pass if every required criterion passes; partial if at least one required criterion passes and at least one fails; fail if no required criterion passes. An LLM judge score alone is never accepted as ground truth.",
+  "notes": "Apply only to cases whose expected_checks reference this rubric_id. Score from the frozen event log + ledger snapshot for that run."
+}

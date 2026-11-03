@@ -273,14 +273,19 @@ Prove collaboration; do not credit Swarm for the Verifier.
 
 ### 8.A Gold set
 
-- [ ] **8.1** Small curated cases (fixtures): fabricated/wrong DOI; preprint-as-peer-review; unit mismatch; computed-as-experimental; single-lab-as-commercial; planted alternative for Challenger; stale-verification; MCP outage; delayed A2A.
-- [ ] **8.2** Human rubric only where a metric is qualitative. No LLM-as-judge as ground truth.
+- [x] **8.1** Small curated cases (fixtures): fabricated/wrong DOI; preprint-as-peer-review; unit mismatch; computed-as-experimental; single-lab-as-commercial; planted alternative for Challenger; stale-verification; MCP outage; delayed A2A.
+  (`eval/gold/`; `packages/axiom_research/eval/gold.py`; `tests/test_eval_gold.py`.)
+- [x] **8.2** Human rubric only where a metric is qualitative. No LLM-as-judge as ground truth.
+  (`eval/gold/rubrics/`; `packages/axiom_research/eval/rubrics.py`; `tests/test_eval_rubrics.py`.)
 
 ### 8.B Runners
 
-- [ ] **8.3** Fixture/snapshot runner (CI). Live-API runner (manual).
-- [ ] **8.4** Three-way comparison, same tools and budgets: (1) one agent, no gate (2) one agent + A2A gate (3) Swarm + A2A gate.
-- [ ] **8.5** Report: citation validity, claim-to-source, planted-error detection, verification coverage, handoff usefulness, redundant tools, latency, token cost, failure behavior.
+- [x] **8.3** Fixture/snapshot runner (CI). Live-API runner (manual).
+  (`eval/snapshots/`; `fixture_runner` / `live_runner`; `scripts/eval_live.py` + `EVAL_LIVE=1`; `tests/test_eval_fixture_runner.py`.)
+- [x] **8.4** Three-way comparison, same tools and budgets: (1) one agent, no gate (2) one agent + A2A gate (3) Swarm + A2A gate.
+  (`EvalMode` + `SharedBudgets`; `eval/snapshots/{mode}/`; `comparison.py`; `tests/test_eval_comparison.py`.)
+- [x] **8.5** Report: citation validity, claim-to-source, planted-error detection, verification coverage, handoff usefulness, redundant tools, latency, token cost, failure behavior.
+  (`packages/axiom_research/eval/report.py`; `eval/reports/sample_fixture_report.{json,md}`; `tests/test_eval_report.py`.)
 
 **Exit:** `eval/` produces a checked-in sample report from fixtures.
 
