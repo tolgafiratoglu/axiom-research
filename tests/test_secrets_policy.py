@@ -64,7 +64,7 @@ def test_dockerfiles_and_dockerignore_keep_secrets_out_of_images() -> None:
     assert ".env" in dockerignore
     assert ".config/rag" in dockerignore or "rag/.env" in dockerignore
 
-    for rel in ("mcp/Dockerfile", "verifier/Dockerfile"):
+    for rel in ("mcp/Dockerfile", "verifier/Dockerfile", "api/Dockerfile"):
         body = (ROOT / rel).read_text(encoding="utf-8")
         copy_lines = [
             line.strip()

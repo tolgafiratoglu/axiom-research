@@ -295,11 +295,16 @@ Prove collaboration; do not credit Swarm for the Verifier.
 
 Interview-ready gold path.
 
-- [ ] **9.1** Pin known live identifiers: OpenAlex/DOI, Materials Project record, PubChem compound, Zenodo record + DataCite PID for the solid-state battery question.
-- [ ] **9.2** Scripted walkthrough `DEMO.md`: compose up, ask the canonical question, point at handoff / MCP / A2A / sticky assessment.
-- [ ] **9.3** Confirm Verifier uses a **different** fetch path than Investigator for at least one PID (Zenodo vs DataCite).
-- [ ] **9.4** Scientific guardrail visible in the Final Assessment text.
-- [ ] **9.5** README status line updated from “pre-implementation” when 0–9 checkboxes for the demo path are done.
+- [x] **9.1** Pin known live identifiers: OpenAlex/DOI, Materials Project record, PubChem compound, Zenodo record + DataCite PID for the solid-state battery question.
+  (`demo/canonical_pins.json`; `packages/axiom_research/demo/pins.py`; `tests/test_demo_pins.py`.)
+- [x] **9.2** Scripted walkthrough `DEMO.md`: compose up, ask the canonical question, point at handoff / MCP / A2A / sticky assessment.
+  (`DEMO.md`; `tests/test_demo_md.py`.)
+- [x] **9.3** Confirm Verifier uses a **different** fetch path than Investigator for at least one PID (Zenodo vs DataCite).
+  (`axiom_research.mcp.dual_path`; Investigator drops `datacite_*`, Verifier drops `zenodo_*`; `tests/test_demo_dual_path.py`.)
+- [x] **9.4** Scientific guardrail visible in the Final Assessment text.
+  (`SCIENTIFIC_GUARDRAIL` on every `answer.final.uncertainty`; `tests/test_demo_guardrail.py`.)
+- [x] **9.5** README status line updated from “pre-implementation” when 0–9 checkboxes for the demo path are done.
+  (`ReadMe.md` status → interview-ready demo path; `tests/test_readme_status.py`.)
 
 **Exit:** one operator can run the demo from `DEMO.md` without tribal knowledge.
 

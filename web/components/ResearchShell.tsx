@@ -51,7 +51,7 @@ function layoutDemoSeed(): {
           citations: ["doi:10.example/prior"],
           disputed: ["[insufficient_evidence] Commercial readiness claim"],
           uncertainty:
-            "A computed property or calculation is not commercial readiness.",
+            "Scientific guardrail: A calculated material property is not proof of manufacturing feasibility, operational safety, cost competitiveness or market adoption.",
         },
       },
       {

@@ -8,6 +8,7 @@ from strands import Agent
 
 from axiom_research.identities import AgentId
 from axiom_research.llm.strands_gemini import build_gemini_model
+from axiom_research.mcp.dual_path import filter_mcp_tools_for_role
 from axiom_research.settings import Settings, settings
 from axiom_research.untrusted import UNTRUSTED_DATA_NOTICE
 
@@ -31,6 +32,8 @@ You are the Independent Verifier for AxiomResearch.
 You re-check claim support using your own MCP tools only.
 You never receive the Swarm transcript or other agents' conclusions as authority.
 You cannot write to the Evidence Ledger or mutate research claims.
+For deposited dataset PIDs, re-resolve via DataCite (datacite_resolve_doi) —
+do not use Zenodo deposit APIs; Investigator already used Zenodo for that PID.
 
 Return ONLY a JSON object with keys:
   claim_id, claim_fingerprint, claim_revision, status, source_refs, verified_revision
@@ -73,7 +76,9 @@ def build_verifier_agent(
 ) -> Agent:
     """Fresh agent per A2A context. ``context_id`` isolates callers."""
     del context_id  # reserved for future per-context session wiring
-    assert_verifier_tools_safe(mcp_tools)
+    # Drop Zenodo tools — dataset PID dual path uses DataCite only (9.3).
+    allowed = filter_mcp_tools_for_role(list(mcp_tools), "verifier")
+    assert_verifier_tools_safe(allowed)
     return Agent(
         name=AgentId.VERIFIER.value,
         description=(
@@ -82,5 +87,5 @@ def build_verifier_agent(
         ),
         model=model if model is not None else build_gemini_model(cfg or settings),
         system_prompt=VERIFIER_PROMPT,
-        tools=list(mcp_tools),
+        tools=allowed,
     )

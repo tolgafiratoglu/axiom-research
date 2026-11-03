@@ -4,8 +4,18 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from api.finalizer.policy import ApprovedSnapshot, COMMERCIAL_READINESS_GUARDRAIL
+from api.finalizer.policy import ApprovedSnapshot, SCIENTIFIC_GUARDRAIL
 from axiom_research.events import AnswerFinal
+
+
+def ensure_scientific_guardrail(text: str | None) -> str:
+    """Guarantee the ReadMe scientific guardrail is present in Final Assessment text."""
+    body = (text or "").strip()
+    if SCIENTIFIC_GUARDRAIL in body:
+        return body
+    if body:
+        return f"{body} {SCIENTIFIC_GUARDRAIL}"
+    return SCIENTIFIC_GUARDRAIL
 
 
 def compose_answer_final(
@@ -15,7 +25,10 @@ def compose_answer_final(
     run_id: str,
     ts: datetime | None = None,
 ) -> AnswerFinal:
-    """Deterministic assessment text — rejected/insufficient never appear as facts."""
+    """Deterministic assessment text — rejected/insufficient never appear as facts.
+
+    The scientific guardrail is always visible on ``answer.final`` (sticky panel).
+    """
     when = ts or datetime.now(tz=UTC)
     if approved.established:
         conclusions = "\n".join(
@@ -30,12 +43,7 @@ def compose_answer_final(
         f"[{item.label}] {item.claim.statement}" for item in approved.disputed
     ]
 
-    notes = list(approved.uncertainty_notes)
-    if COMMERCIAL_READINESS_GUARDRAIL not in notes:
-        # Always surface the product guardrail when any claim existed.
-        if approved.snapshot.claims:
-            notes.append(COMMERCIAL_READINESS_GUARDRAIL)
-    uncertainty = " ".join(notes) if notes else None
+    uncertainty = ensure_scientific_guardrail(" ".join(approved.uncertainty_notes))
 
     return AnswerFinal(
         event_id="",

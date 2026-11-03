@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "question": "Can solid-state batteries realistically replace conventional lithium-ion batteries? What do published studies, computed materials data, and deposited research datasets actually support?",
+  "purpose": "Interview gold-path pins for live MCP hits on all three servers. Tests never call these APIs; operators confirm via scripts/mcp_live_smoke.py / DEMO.md.",
+  "literature": {
+    "provider": "openalex+crossref",
+    "mcp_server": "mcp-literature",
+    "tools": ["openalex_get_work", "crossref_resolve_doi"],
+    "doi": "10.1038/nmat2440",
+    "openalex_work_id": "doi:10.1038/nmat2440",
+    "title_hint": "A lithium superionic conductor (Li10GeP2S12) — Kamaya et al., Nature Materials 2011",
+    "why": "Canonical sulfide SSE landmark paper; DOI resolves on OpenAlex (via doi:) and Crossref."
+  },
+  "materials_project": {
+    "provider": "materials_project",
+    "mcp_server": "mcp-materials",
+    "tools": ["materials_project_get_material"],
+    "material_id": "mp-19017",
+    "formula_hint": "LiFePO4",
+    "evidence_kind": "computed_property",
+    "why": "Computed Li-ion cathode baseline for the replace-Li-ion question; never treat as experimental/commercial proof."
+  },
+  "pubchem": {
+    "provider": "pubchem",
+    "mcp_server": "mcp-materials",
+    "tools": ["pubchem_get_compound"],
+    "cid": 66377,
+    "name_hint": "lithium sulfide",
+    "formula_hint": "Li2S",
+    "why": "Battery-relevant compound metadata via PubChem (distinct from Materials Project computed records)."
+  },
+  "zenodo": {
+    "provider": "zenodo",
+    "mcp_server": "mcp-research-data",
+    "tools": ["zenodo_get_record"],
+    "record_id": "3233912",
+    "doi": "10.5281/zenodo.3233912",
+    "why": "Deposited dataset PID; Investigator fetch path for research-data MCP."
+  },
+  "datacite": {
+    "provider": "datacite",
+    "mcp_server": "mcp-research-data",
+    "tools": ["datacite_resolve_doi"],
+    "doi": "10.5281/zenodo.3233912",
+    "why": "Same dataset PID via DataCite (Verifier independent re-fetch path — see RoadMap 9.3)."
+  },
+  "source_refs": [
+    "doi:10.1038/nmat2440",
+    "materials-project:mp-19017",
+    "pubchem:cid:66377",
+    "zenodo:3233912",
+    "doi:10.5281/zenodo.3233912"
+  ]
+}

@@ -2,8 +2,8 @@
 
 **Energy & Materials Research Intelligence — Evidence-Driven Multi-Agent System**
 
-**Status:** Architecture definition / pre-implementation  
-**Build order:** [`RoadMap.md`](./RoadMap.md) — follow phases 0–9 in order; this README is the locked target, not a backlog.  
+**Status:** Interview-ready demo path complete (RoadMap phases 0–9) — run from [`DEMO.md`](./DEMO.md)  
+**Build order:** [`RoadMap.md`](./RoadMap.md) — phases 0–9 implemented against this locked target.  
 **Purpose:** A complete, interview-ready reference project demonstrating **Strands Agents, autonomous Swarm handoffs, MCP, remote A2A verification, revisioned evidence, and measurable multi-agent performance**.
 
 ## Vision
@@ -121,8 +121,8 @@ Repeatable operator path from an empty working tree. No product auth; all publis
 
    | Host (`127.0.0.1`) | Service | Notes |
    | --- | --- | --- |
-   | `3200` | `web` | UI (Compose stub until the Next image is wired; host `npm run dev` in `web/` is fine for UI work) |
-   | `8200` | `api` | WebSocket `ws://127.0.0.1:8200/ws/session` (`NEXT_PUBLIC_WS_URL`) |
+   | `3200` | `web` | Next.js UI (`web/Dockerfile`); host `npm run dev` still fine for UI iteration |
+   | `8200` | `api` | FastAPI + Swarm + gate (`api/Dockerfile`, `AXIOM_LIVE_BOOTSTRAP=1`); WS `ws://127.0.0.1:8200/ws/session` |
    | `8201` | `verifier` | A2A agent card / health on container port 9000 |
    | `8210` | `mcp-literature` | `GET /health` |
    | `8211` | `mcp-materials` | `GET /health` (needs secrets mount for MP tools) |
@@ -136,9 +136,8 @@ Repeatable operator path from an empty working tree. No product auth; all publis
    curl -sf http://127.0.0.1:8211/health
    curl -sf http://127.0.0.1:8212/health
    curl -sf http://127.0.0.1:8201/.well-known/agent-card.json
-   # When api is no longer a Compose stub:
-   # curl -sf http://127.0.0.1:8200/health/live
-   # curl -sf http://127.0.0.1:8200/health/ready
+   curl -sf http://127.0.0.1:8200/health/live
+   curl -sf http://127.0.0.1:8200/health/ready
    ```
 
 6. **Optional live MCP smoke** (not CI; hits real scientific APIs once): after MCP containers are up and `MP_API_KEY` is in the secrets file, run `.venv/bin/python scripts/mcp_live_smoke.py`.
@@ -311,6 +310,8 @@ Measure **citation validity, claim-to-source support, planted-error detection, v
 ## Canonical Live Demonstration
 
 **Question:** “Can solid-state batteries realistically replace conventional lithium-ion batteries? What do published studies, computed materials data, and deposited research datasets actually support?”
+
+Pinned live identifiers for that gold path (OpenAlex/DOI, Materials Project, PubChem, Zenodo + DataCite) live in [`demo/canonical_pins.json`](./demo/canonical_pins.json). Scripted operator walkthrough: [`DEMO.md`](./DEMO.md). Tests never call those APIs; operators confirm on a live Compose stack.
 
 A successful demo shows:
 

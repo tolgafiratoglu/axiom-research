@@ -33,7 +33,12 @@ def _zenodo_get(record_id: str) -> str:
     return record_id
 
 
-MCP_STUBS = [_openalex_search_works, _mp_get, _zenodo_get]
+@tool(name="datacite_resolve_doi", description="stub — must be filtered from Investigator")
+def _datacite_resolve(doi: str) -> str:
+    return doi
+
+
+MCP_STUBS = [_openalex_search_works, _mp_get, _zenodo_get, _datacite_resolve]
 
 
 def _agents():
@@ -56,6 +61,7 @@ def test_investigator_has_mcp_and_provenance_writes() -> None:
     assert "openalex_search_works" in names
     assert "materials_project_get_material" in names
     assert "zenodo_get_record" in names
+    assert "datacite_resolve_doi" not in names  # 9.3 Verifier dual path
     assert INVESTIGATOR_LEDGER_TOOLS <= names
     assert "upsert_hypothesis" not in names
     assert CALC_TOOL_NAME not in names

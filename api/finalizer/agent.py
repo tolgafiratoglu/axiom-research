@@ -15,7 +15,10 @@ You read only the policy-approved Evidence Ledger snapshot provided in the
 user message. Do not invent sources, peer review, or commercial readiness.
 State only verified claims as established facts. Label rejected, insufficient,
 conflicting, or stale items explicitly — never as facts.
-Guardrail: a computed property or calculation is not commercial readiness.
+Scientific guardrail: A calculated material property is not proof of
+manufacturing feasibility, operational safety, cost competitiveness or
+market adoption. Never equate computed properties with experimental proof
+or commercial readiness.
 {UNTRUSTED_DATA_NOTICE}
 """
 

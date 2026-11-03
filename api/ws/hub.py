@@ -177,10 +177,35 @@ class SessionState:
 class SessionHub:
     """Process-local session registry (Compose api is single process)."""
 
-    def __init__(self, run_factory: RunFactory | None = None) -> None:
+    def __init__(
+        self,
+        run_factory: RunFactory | None = None,
+        *,
+        live_defaults: Any | None = None,
+    ) -> None:
         self._sessions: dict[str, SessionState] = {}
         self._run_factory: RunFactory = run_factory or default_swarm_run_factory
         self._subscribers: dict[str, list[asyncio.Queue[dict[str, Any]]]] = {}
+        # Populated when AXIOM_LIVE_BOOTSTRAP=1 (see api.bootstrap).
+        self._live_defaults = live_defaults
+
+    def set_live_defaults(self, defaults: Any) -> None:
+        self._live_defaults = defaults
+
+    def _apply_live_defaults(self, session: SessionState) -> None:
+        """Attach MCP + A2A Verifier for operator/demo runs (not pytest)."""
+        from api.bootstrap import live_bootstrap_enabled, load_live_hub_defaults
+
+        if not live_bootstrap_enabled():
+            return
+        # Tests inject mocks before ask — do not overwrite.
+        if session.mcp_tools or session.verifier_client is not None:
+            return
+        if self._live_defaults is None:
+            self._live_defaults = load_live_hub_defaults(session.cfg)
+        session.mcp_tools = list(self._live_defaults.mcp_tools)
+        session.verifier_client = self._live_defaults.verifier_client
+        session.cfg = self._live_defaults.cfg
 
     def get_or_create(self, session_id: str | None = None) -> SessionState:
         sid = session_id or f"ses-{uuid.uuid4().hex[:12]}"
@@ -214,6 +239,7 @@ class SessionHub:
         """Start a run. Returns None if a live run already exists (do not restart)."""
         if session.is_live:
             return None
+        self._apply_live_defaults(session)
         run_id = f"run-{uuid.uuid4().hex[:12]}"
         session.live_run_id = run_id
         session.cancel = asyncio.Event()

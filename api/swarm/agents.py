@@ -17,6 +17,7 @@ from api.swarm.policy import (
 )
 from api.swarm.prompts import DESCRIPTIONS, PROMPTS
 from axiom_research.identities import AgentId
+from axiom_research.mcp.dual_path import filter_mcp_tools_for_role
 
 
 def _agent(
@@ -48,9 +49,12 @@ def build_investigator(
     ledger: LedgerTools,
     mcp_tools: list[Any],
 ) -> Agent:
-    """Literature + materials + research-data MCP; owns provenance ledger writes."""
+    """Literature + materials + research-data MCP; owns provenance ledger writes.
+
+    Dataset PIDs: Zenodo tools only (DataCite reserved for Verifier — 9.3).
+    """
     tools = [
-        *mcp_tools,
+        *filter_mcp_tools_for_role(mcp_tools, "investigator"),
         *build_ledger_agent_tools(ledger, INVESTIGATOR_LEDGER_TOOLS),
     ]
     return _agent(AgentId.INVESTIGATOR, model=model, tools=tools)

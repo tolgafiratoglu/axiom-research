@@ -12,9 +12,14 @@ from axiom_research.ledger import (
     VerificationVerdict,
 )
 
-COMMERCIAL_READINESS_GUARDRAIL = (
-    "A computed property or calculation is not commercial readiness."
+# ReadMe / DEMO scientific guardrail — must appear on every answer.final (9.4).
+SCIENTIFIC_GUARDRAIL = (
+    "Scientific guardrail: A calculated material property is not proof of "
+    "manufacturing feasibility, operational safety, cost competitiveness or "
+    "market adoption."
 )
+# Backward-compatible alias used by older tests and imports.
+COMMERCIAL_READINESS_GUARDRAIL = SCIENTIFIC_GUARDRAIL
 
 
 @dataclass(frozen=True)
@@ -89,8 +94,11 @@ def approve_for_finalizer(snapshot: LedgerSnapshot) -> ApprovedSnapshot:
     ) or any(
         e.kind is EvidenceKind.COMPUTED_PROPERTY for e in snapshot.evidence
     )
-    if has_computed and COMMERCIAL_READINESS_GUARDRAIL not in notes:
-        notes.append(COMMERCIAL_READINESS_GUARDRAIL)
+    # Always attach the product scientific guardrail when any ledger claim exists.
+    if snapshot.claims and SCIENTIFIC_GUARDRAIL not in notes:
+        notes.append(SCIENTIFIC_GUARDRAIL)
+    elif has_computed and SCIENTIFIC_GUARDRAIL not in notes:
+        notes.append(SCIENTIFIC_GUARDRAIL)
     if not established and snapshot.claims:
         notes.append("No independently verified claims support a confident conclusion.")
 
