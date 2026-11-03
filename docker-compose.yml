@@ -55,29 +55,43 @@ services:
       - no-new-privileges:true
 
   verifier:
-    image: busybox:1.36
+    build:
+      context: .
+      dockerfile: verifier/Dockerfile
+    image: axiom-research-verifier:0.1.0
     container_name: axiom-research-verifier
-    command: ["sleep", "infinity"]
-    ports:
-      - "127.0.0.1:${VERIFIER_PORT:-8201}:9000"
+    command: ["python", "-m", "verifier"]
     environment:
+      - PORT=9000
+      - VERIFIER_HOST=0.0.0.0
       - LLM_PROVIDER=${LLM_PROVIDER:-gemini}
       - GEMINI_MODEL=${GEMINI_MODEL:-}
       - SECRETS_ENV_PATH=/config/rag/.env
       - MCP_LITERATURE_URL=${MCP_LITERATURE_URL:-http://mcp-literature:8080}
       - MCP_MATERIALS_URL=${MCP_MATERIALS_URL:-http://mcp-materials:8080}
       - MCP_RESEARCH_DATA_URL=${MCP_RESEARCH_DATA_URL:-http://mcp-research-data:8080}
+    ports:
+      - "127.0.0.1:${VERIFIER_PORT:-8201}:9000"
     volumes:
       - ${HOME}/.config/rag:/config/rag:ro
     healthcheck:
-      test: ["CMD", "true"]
-      interval: 30s
-      timeout: 3s
-      retries: 1
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:9000/.well-known/agent-card.json', timeout=2)\"",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     networks:
       - axiom
     security_opt:
       - no-new-privileges:true
+    depends_on:
+      - mcp-literature
+      - mcp-materials
+      - mcp-research-data
 
   mcp-literature:
     build:

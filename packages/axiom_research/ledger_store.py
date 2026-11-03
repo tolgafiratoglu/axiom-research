@@ -64,6 +64,8 @@ class LedgerStore(Protocol):
 
     def get_claim(self, session_id: str, claim_id: str) -> ClaimRecord | None: ...
 
+    def list_claims(self, session_id: str) -> list[ClaimRecord]: ...
+
     def get_hypothesis(
         self, session_id: str, hypothesis_id: str
     ) -> HypothesisRecord | None: ...
@@ -217,6 +219,10 @@ class InMemoryLedgerStore:
         session = self._session(session_id)
         claim = session.claims.get(claim_id)
         return None if claim is None else claim.model_copy(deep=True)
+
+    def list_claims(self, session_id: str) -> list[ClaimRecord]:
+        session = self._session(session_id)
+        return [c.model_copy(deep=True) for c in session.claims.values()]
 
     def get_hypothesis(self, session_id: str, hypothesis_id: str) -> HypothesisRecord | None:
         session = self._session(session_id)

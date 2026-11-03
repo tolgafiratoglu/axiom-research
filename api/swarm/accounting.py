@@ -26,6 +26,9 @@ class TokenCostAccounting:
         default_factory=lambda: settings.gemini_output_usd_per_mtok
     )
     turns: list[TurnUsage] = field(default_factory=list)
+    max_tokens: int | None = None
+    max_cost_usd: float | None = None
+    exceeded_reason: str | None = None
 
     @classmethod
     def from_settings(cls, cfg: Settings | None = None) -> TokenCostAccounting:
@@ -33,6 +36,8 @@ class TokenCostAccounting:
         return cls(
             input_usd_per_mtok=ready.gemini_input_usd_per_mtok,
             output_usd_per_mtok=ready.gemini_output_usd_per_mtok,
+            max_tokens=ready.swarm_max_tokens_per_run,
+            max_cost_usd=ready.swarm_max_cost_usd_per_run,
         )
 
     @property
@@ -72,11 +77,28 @@ class TokenCostAccounting:
     def attach(self, agent: Any) -> None:
         """Register on a Strands ``Agent`` (or any object with ``add_hook``)."""
         try:
-            from strands.hooks import AfterModelCallEvent
+            from strands.hooks import AfterModelCallEvent, BeforeModelCallEvent
         except ImportError:  # pragma: no cover
-            from strands.hooks.events import AfterModelCallEvent  # type: ignore[no-redef]
+            from strands.hooks.events import (  # type: ignore[no-redef]
+                AfterModelCallEvent,
+                BeforeModelCallEvent,
+            )
 
+        agent.add_hook(self.before_model_call, BeforeModelCallEvent)
         agent.add_hook(self.after_model_call, AfterModelCallEvent)
+
+    def ceiling_reason(self) -> str | None:
+        if self.max_tokens is not None and self.total_tokens >= self.max_tokens:
+            return "run.failed: token ceiling exceeded"
+        if self.max_cost_usd is not None and self.total_cost_usd >= self.max_cost_usd:
+            return "run.failed: cost ceiling exceeded"
+        return None
+
+    def before_model_call(self, event: Any) -> None:
+        reason = self.exceeded_reason or self.ceiling_reason()
+        if reason:
+            self.exceeded_reason = reason
+            event.cancel = reason
 
     def after_model_call(self, event: Any) -> None:
         usage = usage_from_model_event(event)
@@ -89,6 +111,10 @@ class TokenCostAccounting:
             input_tokens=usage["input_tokens"],
             output_tokens=usage["output_tokens"],
         )
+        reason = self.ceiling_reason()
+        if reason:
+            self.exceeded_reason = reason
+
 
 
 def usage_from_model_event(event: Any) -> dict[str, int] | None:

@@ -152,13 +152,15 @@ Exploratory collaboration inside `api`. No Verifier, no UI.
 
 ### 3.C Swarm runtime
 
-- [ ] **3.7** `handoff_to_agent`; `entry_point=planner`.
-- [ ] **3.8** Budgets from 0.A: `max_handoffs=8`, `max_iterations=8`, `execution_timeout=180s`, `node_timeout=45s`. Repetitive handoff detection **on**.
-- [ ] **3.9** Per-question token/cost ceiling; stop with `run.failed` semantics when exceeded.
-- [ ] **3.10** CLI: `python -m api.cli "question"` prints node history + ledger summary (no Finalizer yet).
-- [ ] **3.11** Tests with mocked MCP + mocked Gemini: tool-visibility, planner-without-MCP, analyst-does-not-search, repetitive handoff stops.
+- [x] **3.7** `handoff_to_agent`; `entry_point=planner`.
+- [x] **3.8** Budgets from 0.A: `max_handoffs=8`, `max_iterations=8`, `execution_timeout=180s`, `node_timeout=45s`. Repetitive handoff detection **on**.
+- [x] **3.9** Per-question token/cost ceiling; stop with `run.failed` semantics when exceeded.
+- [x] **3.10** CLI: `python -m api.cli "question"` prints node history + ledger summary (no Finalizer yet).
+- [x] **3.11** Tests with mocked MCP + mocked Gemini: tool-visibility, planner-without-MCP, analyst-does-not-search, repetitive handoff stops.
 
 **Exit:** CLI run against mocks shows at least one real `handoff_to_agent` and ledger rows; budgets enforced.
+(`python -m api.cli --mock "…"`; unit: `tests/test_swarm_runtime.py`.)
+
 
 ---
 
@@ -168,17 +170,20 @@ The only frontend transport.
 
 ### 4.A Session and socket
 
-- [ ] **4.1** `WS /ws/session`: one socket per conversation. `ask` starts a run; `cancel` aborts; heartbeat.
-- [ ] **4.2** Event log persisted; reconnect with `last_event_id` replays missed events and **does not** restart a live run.
-- [ ] **4.3** Follow-up `ask` on the same session uses conversation memory + current ledger, not a blank Swarm.
+- [x] **4.1** `WS /ws/session`: one socket per conversation. `ask` starts a run; `cancel` aborts; heartbeat.
+- [x] **4.2** Event log persisted; reconnect with `last_event_id` replays missed events and **does not** restart a live run.
+- [x] **4.3** Follow-up `ask` on the same session uses conversation memory + current ledger, not a blank Swarm.
+
 
 ### 4.B Event normalization
 
-- [ ] **4.4** Map Strands `multiagent_*` stream events → stable UI events from 0.5. Browser never sees raw SDK keys.
-- [ ] **4.5** Ledger tool completions emit `evidence.updated` / `hypothesis.created` (not raw JSON dumps).
-- [ ] **4.6** Tests: WS client fixture, replay, cancel, mapping table.
+- [x] **4.4** Map Strands `multiagent_*` stream events → stable UI events from 0.5. Browser never sees raw SDK keys.
+- [x] **4.5** Ledger tool completions emit `evidence.updated` / `hypothesis.created` (not raw JSON dumps).
+- [x] **4.6** Tests: WS client fixture, replay, cancel, mapping table.
 
 **Exit:** a mocked Swarm run streams the stable event set over WS; reconnect test passes.
+(`tests/test_ws_normalize.py`; reconnect replay covered with mocked Swarm stream.)
+
 
 ---
 
@@ -188,17 +193,18 @@ This is the release boundary. Swarm must not write the user-facing answer.
 
 ### 5.A `verifier` service
 
-- [ ] **5.1** Strands `A2AServer` in its own container (`agent_factory` per context).
-- [ ] **5.2** Own MCP HTTP clients to the three servers. No Postgres claim writes. No Swarm transcript in the A2A payload.
-- [ ] **5.3** Returns only `verified` | `rejected` | `insufficient_evidence` | `conflicting_evidence` plus source refs + revision.
-- [ ] **5.4** Tests: payload without agent opinions; cannot mutate claims.
+- [x] **5.1** Strands `A2AServer` in its own container (`agent_factory` per context).
+- [x] **5.2** Own MCP HTTP clients to the three servers. No Postgres claim writes. No Swarm transcript in the A2A payload.
+- [x] **5.3** Returns only `verified` | `rejected` | `insufficient_evidence` | `conflicting_evidence` plus source refs + revision.
+- [x] **5.4** Tests: payload without agent opinions; cannot mutate claims.
+
 
 ### 5.B Gate (deterministic, in `api`)
 
-- [ ] **5.5** After Swarm stop (success **or** budget), freeze snapshot; collect claims for the assessment.
-- [ ] **5.6** Send unverified **current** revisions to Verifier via `A2AAgent` (application code, not Swarm handoff).
-- [ ] **5.7** Reject stale verification, schema-invalid results, transport-success-without-science.
-- [ ] **5.8** Unreachable Verifier / timeout → `run.failed` / labeled incomplete assessment. **No confident Finalizer output.**
+- [x] **5.5** After Swarm stop (success **or** budget), freeze snapshot; collect claims for the assessment.
+- [x] **5.6** Send unverified **current** revisions to Verifier via `A2AAgent` (application code, not Swarm handoff).
+- [x] **5.7** Reject stale verification, schema-invalid results, transport-success-without-science.
+- [x] **5.8** Unreachable Verifier / timeout → `run.failed` / labeled incomplete assessment. **No confident Finalizer output.**
 
 ### 5.C Finalizer
 

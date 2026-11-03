@@ -74,6 +74,9 @@ class LedgerTools:
         """Claims only — never returns a hypothesis row."""
         return self._store.get_claim(self.session_id, claim_id)
 
+    def list_claims(self) -> list[ClaimRecord]:
+        return self._store.list_claims(self.session_id)
+
     def get_hypothesis(self, hypothesis_id: str) -> HypothesisRecord | None:
         return self._store.get_hypothesis(self.session_id, hypothesis_id)
 

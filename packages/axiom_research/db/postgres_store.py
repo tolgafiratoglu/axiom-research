@@ -337,6 +337,14 @@ class PostgresLedgerStore:
             return None
         return ClaimRecord.model_validate(row["payload"])
 
+    def list_claims(self, session_id: str) -> list[ClaimRecord]:
+        with self._connect() as conn:
+            rows = conn.execute(
+                "SELECT payload FROM claims WHERE session_id = %s ORDER BY claim_id",
+                (session_id,),
+            ).fetchall()
+        return [ClaimRecord.model_validate(r["payload"]) for r in rows]
+
     def get_hypothesis(
         self, session_id: str, hypothesis_id: str
     ) -> HypothesisRecord | None:

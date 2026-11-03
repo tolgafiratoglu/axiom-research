@@ -92,10 +92,10 @@ def test_token_cost_accounting_records_per_turn() -> None:
     assert accounting.turns[-1].total_tokens == 150
 
     agent = MagicMock()
-    fake_hooks = MagicMock(AfterModelCallEvent=object)
+    fake_hooks = MagicMock(AfterModelCallEvent=object, BeforeModelCallEvent=object)
     with patch.dict(
         "sys.modules",
         {"strands": MagicMock(), "strands.hooks": fake_hooks},
     ):
         accounting.attach(agent)
-    agent.add_hook.assert_called_once()
+    assert agent.add_hook.call_count == 2

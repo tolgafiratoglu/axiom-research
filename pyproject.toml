@@ -12,9 +12,10 @@ dependencies = [
     "httpx2>=2.5.0",
     "websockets>=13,<17",
     "starlette>=0.40",
+    "fastapi>=0.115",
     "uvicorn[standard]>=0.32",
     "psycopg[binary]>=3.2",
-    "strands-agents[gemini]>=1.0",
+    "strands-agents[gemini,a2a]>=1.0",
 ]
 
 [project.scripts]
@@ -22,6 +23,7 @@ axiom-mcp-literature = "axiom_research.mcp.servers.literature:main"
 axiom-mcp-materials = "axiom_research.mcp.servers.materials:main"
 axiom-mcp-research-data = "axiom_research.mcp.servers.research_data:main"
 axiom-db-migrate = "axiom_research.db.migrate:main"
+axiom-verifier = "verifier.server:main"
 
 [project.optional-dependencies]
 dev = [
@@ -29,6 +31,9 @@ dev = [
     "pytest-asyncio",
     "ruff>=0.6",
     "pyyaml>=6",
+]
+a2a = [
+    "strands-agents[a2a]>=1.0",
 ]
 
 [build-system]

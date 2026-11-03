@@ -45,6 +45,20 @@ class Settings(BaseSettings):
     mcp_literature_url: str = "http://127.0.0.1:8210"
     mcp_materials_url: str = "http://127.0.0.1:8211"
     mcp_research_data_url: str = "http://127.0.0.1:8212"
+    # Host-side default; Compose api uses http://verifier:9000 via VERIFIER_URL.
+    verifier_url: str = "http://127.0.0.1:8201"
+    verifier_timeout_seconds: float = 60.0
+
+    # Swarm budgets (0.A defaults; tighter than Strands SDK defaults).
+    swarm_max_handoffs: int = 8
+    swarm_max_iterations: int = 8
+    swarm_execution_timeout_seconds: float = 180.0
+    swarm_node_timeout_seconds: float = 45.0
+    swarm_repetitive_handoff_detection: bool = True
+    swarm_repetitive_handoff_detection_window: int = 8
+    swarm_repetitive_handoff_min_unique_agents: int = 3
+    swarm_max_tokens_per_run: int = 100_000
+    swarm_max_cost_usd_per_run: float = 1.0
     # Operator-overridable Flash pricing for Swarm token/cost accounting (USD / 1M tokens).
     gemini_input_usd_per_mtok: float = 0.30
     gemini_output_usd_per_mtok: float = 2.50
