@@ -1,7 +1,7 @@
 {
   "version": 1,
   "question": "Can solid-state batteries realistically replace conventional lithium-ion batteries? What do published studies, computed materials data, and deposited research datasets actually support?",
-  "purpose": "Interview gold-path pins for live MCP hits on all three servers. Tests never call these APIs; operators confirm via scripts/mcp_live_smoke.py / DEMO.md.",
+  "purpose": "Canonical gold-path pins for live MCP hits on all three servers. Tests never call these APIs; operators confirm via scripts/mcp_live_smoke.py / RUNBOOK.md.",
   "literature": {
     "provider": "openalex+crossref",
     "mcp_server": "mcp-literature",

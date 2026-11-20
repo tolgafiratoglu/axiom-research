@@ -1,4 +1,4 @@
-"""9.5 — README status reflects completed 0–9 demo path (not pre-implementation)."""
+"""9.5 — README status reflects completed 0–9 canonical path (not pre-implementation)."""
 
 from __future__ import annotations
 
@@ -16,8 +16,9 @@ def test_readme_status_is_no_longer_pre_implementation() -> None:
         line for line in text.splitlines() if line.startswith("**Status:**")
     )
     assert "pre-implementation" not in status_line.lower()
-    assert "interview-ready" in status_line.lower()
-    assert "DEMO.md" in status_line
+    assert "interview" not in status_line.lower()
+    assert "RUNBOOK.md" in status_line
+    assert "0–9" in status_line or "0-9" in status_line
 
 
 def test_roadmap_phase_9_demo_path_checkboxes_complete() -> None:

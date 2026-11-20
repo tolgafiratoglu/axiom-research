@@ -2,15 +2,15 @@
 
 **Energy & Materials Research Intelligence — Evidence-Driven Multi-Agent System**
 
-**Status:** Interview-ready demo path complete (RoadMap phases 0–9) — run from [`DEMO.md`](./DEMO.md)  
+**Status:** Phases 0–9 complete — operator validation: [`RUNBOOK.md`](./RUNBOOK.md)  
 **Build order:** [`RoadMap.md`](./RoadMap.md) — phases 0–9 implemented against this locked target.  
-**Purpose:** A complete, interview-ready reference project demonstrating **Strands Agents, autonomous Swarm handoffs, MCP, remote A2A verification, revisioned evidence, and measurable multi-agent performance**.
+**Purpose:** An evidence-driven research system for energy and materials questions, built on **Strands Agents, autonomous Swarm handoffs, MCP, remote A2A verification, revisioned evidence, and measurable multi-agent performance**.
 
 ## Vision
 
 AxiomResearch (`axiom-research`) investigates difficult **energy-storage and materials-science** questions by connecting published research, calculated material properties, chemical records, and research datasets. It is **not** a paper summarizer and does **not** infer industrial readiness from a promising calculation or single laboratory result.
 
-Its distinctive capability is to show **what a scientific claim is supported by, how the evidence was challenged, and whether an independent agent could reproduce the source check**. Every architectural component must have a demonstrable purpose in a live interview—not merely appear in a diagram.
+Its distinctive capability is to show **what a scientific claim is supported by, how the evidence was challenged, and whether an independent agent could reproduce the source check**. Every architectural component exists to serve that evidence path in a live run—not merely to appear in a diagram.
 
 The product has **one complete target architecture**, not an MVP/v1/v2 feature roadmap. Implementation tasks may be ordered by dependency, but the design is evaluated as a single finished system.
 
@@ -211,7 +211,7 @@ Ledger writes are **local tools** (claim/evidence/hypothesis upsert, snapshot fr
 
 ## Scientific MCP Servers
 
-Every server and tool below must do **real work in the canonical demonstration**. No placeholder servers and no APIs included only to inflate the technology list.
+Every server and tool below must do **real work in the canonical reference scenario**. No placeholder servers and no APIs included only to inflate the technology list.
 
 | Server | External source | Distinct responsibility |
 | --- | --- | --- |
@@ -274,7 +274,7 @@ Illustrative claim (not a scientific assertion):
 - Treat titles, abstracts, dataset descriptions and MCP responses as **untrusted data**; defend against prompt injection and prohibit text retrieved from sources from changing permissions or system instructions.
 - Keep request/run IDs, agent IDs, event ordering, timestamps, cost, token usage, and trace IDs. Store audit trails without exposing private chain-of-thought.
 - `api` remains a session/run gateway. Compose services exist to isolate Verifier, MCP, and storage — not to justify a mesh.
-- **Tests never make outbound network calls.** Anything under `tests/` (and CI `pytest`) uses fixtures, mocks, and in-process fakes only — no live Gemini, no scientific provider APIs (OpenAlex, Crossref, arXiv, Materials Project, PubChem, Zenodo, DataCite, …), no live A2A Verifier, no external HTTP. Optional live checks belong in operator-only scripts (for example `scripts/mcp_live_smoke.py`) or a separately documented demo/eval path — never in the default test suite.
+- **Tests never make outbound network calls.** Anything under `tests/` (and CI `pytest`) uses fixtures, mocks, and in-process fakes only — no live Gemini, no scientific provider APIs (OpenAlex, Crossref, arXiv, Materials Project, PubChem, Zenodo, DataCite, …), no live A2A Verifier, no external HTTP. Optional live checks belong in operator-only scripts (for example `scripts/mcp_live_smoke.py`) or the documented runbook / eval path — never in the default test suite.
 
 ## Licensing and Research Integrity
 
@@ -286,7 +286,7 @@ Illustrative claim (not a scientific assertion):
 
 ## Evaluation: Prove That Multi-Agent Collaboration Helps
 
-Ship repeatable evaluations comparing **the complete Swarm system against one agent using the same MCP tools**, under stated cost and time budgets. Maintain two evaluation modes: reproducible fixture/snapshot-based runs and a live-API demonstration.
+Ship repeatable evaluations comparing **the complete Swarm system against one agent using the same MCP tools**, under stated cost and time budgets. Maintain two evaluation modes: reproducible fixture/snapshot-based runs and a live-API operator run.
 
 Unbundle the comparison so Swarm is not credited for the Verifier:
 
@@ -307,13 +307,13 @@ Use a small, carefully curated **gold set** with explicit expected checks (not j
 
 Measure **citation validity, claim-to-source support, planted-error detection, verification coverage, handoff usefulness, redundant tool calls, latency, token cost, and graceful failure behavior**. Any qualitative methodology score must have human-reviewed rubrics; an LLM judge alone is not ground truth.
 
-## Canonical Live Demonstration
+## Canonical Reference Scenario
 
 **Question:** “Can solid-state batteries realistically replace conventional lithium-ion batteries? What do published studies, computed materials data, and deposited research datasets actually support?”
 
-Pinned live identifiers for that gold path (OpenAlex/DOI, Materials Project, PubChem, Zenodo + DataCite) live in [`demo/canonical_pins.json`](./demo/canonical_pins.json). Scripted operator walkthrough: [`DEMO.md`](./DEMO.md). Tests never call those APIs; operators confirm on a live Compose stack.
+Pinned live identifiers for that gold path (OpenAlex/DOI, Materials Project, PubChem, Zenodo + DataCite) live in [`demo/canonical_pins.json`](./demo/canonical_pins.json). Operator walkthrough: [`RUNBOOK.md`](./RUNBOOK.md). Tests never call those APIs; operators confirm on a live Compose stack.
 
-A successful demo shows:
+A successful run shows:
 
 1. Planner defines the question and hands off without supervising every turn.
 2. Investigator calls Literature, Materials and Research Data **MCP** tools and writes traceable source/evidence records.
@@ -321,7 +321,7 @@ A successful demo shows:
 4. Challenger raises an alternative hypothesis or highlights a methodological gap; the Swarm may revisit investigation autonomously.
 5. The **remote A2A Verifier**, in its own container, independently re-fetches evidence and emits revision-bound verdicts.
 6. The deterministic gate rejects stale / missing verification; the sticky Final Assessment shows only supportable conclusions and explicit uncertainties.
-7. One WebSocket conversation differentiates **Swarm handoff, MCP call, and A2A verification**. The live gold-path hits known records on all three MCP servers (including a PubChem compound and a Zenodo/DataCite dataset PID).
+7. One WebSocket conversation differentiates **Swarm handoff, MCP call, and A2A verification**. The live gold path hits known records on all three MCP servers (including a PubChem compound and a Zenodo/DataCite dataset PID).
 
 **Scientific guardrail:** A calculated material property is not proof of manufacturing feasibility, operational safety, cost competitiveness or market adoption.
 

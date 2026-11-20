@@ -8,8 +8,8 @@ This is the **implementation order** of the single target system in [`ReadMe.md`
 - Finish a **subsection** (e.g. 1.B) before opening the next subsection in the same phase.
 - Checkboxes are the source of progress. Mark `[x]` only when the item is in the tree and its tests (if listed) pass.
 - If a change would violate [`ReadMe.md`](./ReadMe.md) boundaries, change the README first — do not “just ship it”.
-- **No outbound network from tests** (see [`ReadMe.md`](./ReadMe.md) Runtime rule). `tests/` / `pytest` use fixtures and mocks only — never live Gemini, scientific APIs, or live A2A. Live smoke (1.15), Inspector, eval live runner, and `DEMO.md` are **operator-only**, not CI.
-- Agent runs **only** the fixture named on the current item (`pytest` that file, once). Operator runs `docker compose up`, live smoke (1.15), Inspector, eval live runner, and `DEMO.md`.
+- **No outbound network from tests** (see [`ReadMe.md`](./ReadMe.md) Runtime rule). `tests/` / `pytest` use fixtures and mocks only — never live Gemini, scientific APIs, or live A2A. Live smoke (1.15), Inspector, eval live runner, and `RUNBOOK.md` are **operator-only**, not CI.
+- Agent runs **only** the fixture named on the current item (`pytest` that file, once). Operator runs `docker compose up`, live smoke (1.15), Inspector, eval live runner, and `RUNBOOK.md`.
 - Ports, Swarm budget numbers, npm names, and MCP directory names recorded in **0.A** stay unless the README changes.
 
 **Locked decisions (do not revisit during build)**
@@ -242,7 +242,7 @@ One screen, one socket. Not NASA’s three-column console, not Travel RAG’s an
 - [x] **6.9** Browser-verify the canonical question layout (sticky + stream + input) before closing the phase.
   (`AssessmentHistoryCard`; offline `?demo=layout` for sticky + stream + input check.)
 
-**Exit:** UI walkthrough against mocked or local stack shows the seven demo beats from the README.
+**Exit:** UI walkthrough against mocked or local stack shows the seven reference-scenario beats from the README.
 (`web/?demo=layout` — no live Gemini/scientific APIs.)
 
 ---
@@ -291,22 +291,22 @@ Prove collaboration; do not credit Swarm for the Verifier.
 
 ---
 
-## 9. Canonical demo lock
+## 9. Canonical scenario lock
 
-Interview-ready gold path.
+Gold-path pins and operator runbook for the solid-state battery question.
 
 - [x] **9.1** Pin known live identifiers: OpenAlex/DOI, Materials Project record, PubChem compound, Zenodo record + DataCite PID for the solid-state battery question.
   (`demo/canonical_pins.json`; `packages/axiom_research/demo/pins.py`; `tests/test_demo_pins.py`.)
-- [x] **9.2** Scripted walkthrough `DEMO.md`: compose up, ask the canonical question, point at handoff / MCP / A2A / sticky assessment.
-  (`DEMO.md`; `tests/test_demo_md.py`.)
+- [x] **9.2** Scripted walkthrough `RUNBOOK.md`: compose up, ask the canonical question, confirm handoff / MCP / A2A / sticky assessment.
+  (`RUNBOOK.md`; `tests/test_demo_md.py`.)
 - [x] **9.3** Confirm Verifier uses a **different** fetch path than Investigator for at least one PID (Zenodo vs DataCite).
   (`axiom_research.mcp.dual_path`; Investigator drops `datacite_*`, Verifier drops `zenodo_*`; `tests/test_demo_dual_path.py`.)
 - [x] **9.4** Scientific guardrail visible in the Final Assessment text.
   (`SCIENTIFIC_GUARDRAIL` on every `answer.final.uncertainty`; `tests/test_demo_guardrail.py`.)
-- [x] **9.5** README status line updated from “pre-implementation” when 0–9 checkboxes for the demo path are done.
-  (`ReadMe.md` status → interview-ready demo path; `tests/test_readme_status.py`.)
+- [x] **9.5** README status line updated from “pre-implementation” when 0–9 checkboxes for the canonical path are done.
+  (`ReadMe.md` status → phases 0–9 complete + `RUNBOOK.md`; `tests/test_readme_status.py`.)
 
-**Exit:** one operator can run the demo from `DEMO.md` without tribal knowledge.
+**Exit:** one operator can validate the canonical scenario from `RUNBOOK.md` without tribal knowledge.
 
 ---
 
@@ -323,4 +323,4 @@ Do **not** add these while following this map:
 - Duplicating MCP containers “for isolation theater”
 
 Build order reminder: **0 → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9**.
-The first user-visible vertical slice that is allowed to look “complete” is the end of **Phase 5** (WS + Swarm + gate + Finalizer). The UI in Phase 6 is the interview skin on that slice, not a second architecture.
+The first user-visible vertical slice that is allowed to look “complete” is the end of **Phase 5** (WS + Swarm + gate + Finalizer). The UI in Phase 6 is the presentation layer on that slice, not a second architecture.

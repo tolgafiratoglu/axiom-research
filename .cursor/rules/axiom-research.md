@@ -10,5 +10,5 @@ Cevabını mümkün olduğunca şu sırayla ver:
 
 - Değiştirilen / oluşturulan dosyalar ve Kod blokları
 - Kod bloklarını verirken koddaki yerine linklenebilecek şekilde yaz.
-- Doğrulama: agent’ın çalıştırdığı dar test vs benim çalıştırmam gereken live/demo komutları
+- Doğrulama: agent’ın çalıştırdığı dar test vs benim çalıştırmam gereken live/runbook komutları
 - REST API varsa Postman için cURL örnekleri; WS varsa zarf örneği

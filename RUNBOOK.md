@@ -1,6 +1,6 @@
-# AxiomResearch — canonical live demo
+# AxiomResearch — operator runbook
 
-Operator walkthrough for the interview gold path. No tribal knowledge required.
+End-to-end validation of the canonical solid-state battery investigation on a live Compose stack. No tribal knowledge required.
 **Agents / CI do not run this document** — it hits Compose, Gemini, and scientific APIs.
 
 Pinned identifiers: [`demo/canonical_pins.json`](./demo/canonical_pins.json)  
@@ -81,8 +81,8 @@ export SECRETS_ENV_PATH=~/.config/rag/.env
 
 ## 2. Open the UI
 
-- Live demo: `http://127.0.0.1:3200/`
-- Layout-only (no Gemini / no MCP): `http://127.0.0.1:3200/?demo=layout`
+- Live stack: `http://127.0.0.1:3200/`
+- Offline layout check (no Gemini / no MCP): `http://127.0.0.1:3200/?demo=layout`
 
 WebSocket: `ws://127.0.0.1:8200/ws/session` (`NEXT_PUBLIC_WS_URL`).
 
@@ -107,9 +107,9 @@ Cancel (optional): `{"type":"cancel","run_id":"<run_id>"}`.
 
 ---
 
-## 4. What to point at in the interview
+## 4. Expected investigation signals
 
-Watch the **investigation thread** (only this region scrolls). Call out four distinct signals:
+Confirm the **investigation thread** (only this region scrolls) shows four distinct mechanisms:
 
 ### A. Swarm handoff — `agent.handoff`
 
@@ -137,7 +137,7 @@ Watch the **investigation thread** (only this region scrolls). Call out four dis
 - Conclusions must stay source-grounded. Sticky **uncertainty** always includes the scientific guardrail: *A calculated material property is not proof of manufacturing feasibility, operational safety, cost competitiveness or market adoption.*
 - On follow-up, sticky returns to in-progress; prior assessment collapses into a history card in the thread.
 
-Failure path (also fine to show): MCP 429/timeout → `tool.summary` with `ok=false`; unreachable Verifier → `run.failed` / gate fail — **no falsely confident** `answer.final`.
+Failure path (also expected under fault injection): MCP 429/timeout → `tool.summary` with `ok=false`; unreachable Verifier → `run.failed` / gate fail — **no falsely confident** `answer.final`.
 
 ---
 
@@ -145,7 +145,7 @@ Failure path (also fine to show): MCP 429/timeout → `tool.summary` with `ok=fa
 
 - [ ] `docker compose up -d --build` healthy (MCP, Verifier, api, web, Postgres)  
 - [ ] Canonical question asked over one WebSocket  
-- [ ] Pointed at **handoff**, **MCP**, **A2A**, **sticky assessment**  
+- [ ] Confirmed **handoff**, **MCP**, **A2A**, and **sticky assessment** in the thread  
 - [ ] Guardrail visible in Final Assessment uncertainty (manufacturing / safety / cost / adoption)  
 
 Tear down: `docker compose down` (add `-v` only to wipe Postgres).
